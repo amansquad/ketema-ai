@@ -1,17 +1,18 @@
 "use client";
 
 import { TransformControls } from "@react-three/drei";
-import type { Mesh } from "three";
+import type { Object3D } from "three";
 
 import { useEditorStore } from "@/features/editor/store/useEditorStore";
 
 interface SelectionGizmoProps {
-  target: Mesh;
+  target: Object3D;
   objectId: string;
 }
 
 // Attached only when exactly one object is selected (three.js TransformControls
-// operates on a single Object3D). The gizmo manipulates the mesh directly for
+// operates on a single Object3D — here, one drei `Instance` from its asset's
+// instanced mesh group). The gizmo manipulates that instance directly for
 // smooth per-frame feedback; the store is only written to once, on release,
 // so undo/redo gets one history entry per drag instead of one per frame.
 export function SelectionGizmo({ target, objectId }: SelectionGizmoProps) {

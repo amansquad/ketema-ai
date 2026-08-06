@@ -5,10 +5,12 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 
 import { SceneContent } from "@/features/editor/components/Scene/SceneContent";
+import { ViewportRegistrar } from "@/features/editor/components/Scene/ViewportRegistrar";
 
 export function EditorCanvas() {
   return (
     <Canvas shadows dpr={[1, 2]} className="touch-none">
+      <ViewportRegistrar />
       <PerspectiveCamera makeDefault position={[30, 26, 30]} fov={50} near={0.1} far={4000} />
       <OrbitControls makeDefault enableDamping dampingFactor={0.08} minDistance={4} maxDistance={800} />
 

@@ -1,23 +1,15 @@
 "use client";
 
-import { Copy, Move, Plus, Redo2, RotateCw, Scaling, Trash2, Undo2 } from "lucide-react";
+import { Copy, Move, Redo2, RotateCw, Scaling, Trash2, Undo2 } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 
 import { useEditorStore } from "@/features/editor/store/useEditorStore";
-import type { AssetKind, TransformMode } from "@/features/editor/types";
+import type { TransformMode } from "@/features/editor/types";
 
 const TRANSFORM_MODES: { mode: TransformMode; label: string; Icon: ComponentType<{ className?: string }> }[] = [
   { mode: "translate", label: "Move (1)", Icon: Move },
   { mode: "rotate", label: "Rotate (2)", Icon: RotateCw },
   { mode: "scale", label: "Scale (3)", Icon: Scaling },
-];
-
-const QUICK_ADD: { kind: AssetKind; label: string }[] = [
-  { kind: "building-residential", label: "House" },
-  { kind: "building-commercial", label: "Office" },
-  { kind: "tree", label: "Tree" },
-  { kind: "solar-panel", label: "Solar" },
-  { kind: "road", label: "Road" },
 ];
 
 function ToolbarButton({
@@ -60,7 +52,6 @@ export function EditorToolbar() {
   const duplicateSelected = useEditorStore((state) => state.duplicateSelected);
   const deleteSelected = useEditorStore((state) => state.deleteSelected);
   const hasSelection = useEditorStore((state) => state.selectedIds.length > 0);
-  const addObject = useEditorStore((state) => state.addObject);
 
   return (
     <div className="pointer-events-none absolute inset-x-0 top-4 z-10 flex flex-col items-center gap-2">
@@ -93,20 +84,6 @@ export function EditorToolbar() {
         <ToolbarButton title="Delete (Del)" onClick={deleteSelected} disabled={!hasSelection}>
           <Trash2 className="h-4 w-4" />
         </ToolbarButton>
-      </div>
-
-      <div className="pointer-events-auto flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/90 p-1 shadow-lg backdrop-blur">
-        <Plus className="ml-1 h-4 w-4 text-zinc-500" />
-        {QUICK_ADD.map(({ kind, label }) => (
-          <button
-            key={kind}
-            type="button"
-            onClick={() => addObject({ assetKind: kind, name: label })}
-            className="rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white"
-          >
-            {label}
-          </button>
-        ))}
       </div>
     </div>
   );

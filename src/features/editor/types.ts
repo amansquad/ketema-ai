@@ -47,5 +47,5 @@ export interface SceneObject {
 
 export type TransformMode = "translate" | "rotate" | "scale";
 
-export type SceneObjectDraft = Pick<SceneObject, "assetKind" | "name"> &
-  Partial<Omit<SceneObject, "id" | "assetKind" | "name" | "createdAt" | "updatedAt">>;
+export type SceneObjectDraft = Pick<SceneObject, "assetKind"> &
+  Partial<Omit<SceneObject, "id" | "assetKind" | "createdAt" | "updatedAt">>;
