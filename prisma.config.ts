@@ -1,5 +1,11 @@
-import "dotenv/config";
+import { config } from "dotenv";
 import { defineConfig } from "prisma/config";
+
+// `dotenv/config` only auto-loads `.env` — Next.js's convention of
+// `.env.local` overriding `.env` needs to be replicated by hand here since
+// the Prisma CLI runs outside Next's own env loader.
+config({ path: ".env" });
+config({ path: ".env.local", override: true });
 
 // Prisma 7: this file supplies the connection used by CLI commands
 // (`migrate`, `db push`, `studio`). Use the *direct* (non-pooled) connection
