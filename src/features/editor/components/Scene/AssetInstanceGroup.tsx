@@ -1,6 +1,7 @@
 "use client";
 
 import { Instance, Instances } from "@react-three/drei";
+import { useCallback } from "react";
 import type { Object3D } from "three";
 
 import { ASSET_DEFAULTS } from "@/features/editor/lib/createSceneObject";
@@ -52,20 +53,52 @@ export function AssetInstanceGroup({
       {isCylindrical ? <cylinderGeometry args={[0.5, 0.5, 1, 16]} /> : <boxGeometry args={[1, 1, 1]} />}
       <meshStandardMaterial roughness={defaults.roughness} metalness={defaults.metalness} />
       {objects.map((object) => (
-        <Instance
+        <InstanceItem
           key={object.id}
-          ref={(node: Object3D | null) => onSelectRef(object.id, node)}
-          position={object.position}
-          rotation={object.rotation}
-          scale={object.scale}
-          color={selectedIds.includes(object.id) ? SELECTED_COLOR : object.material.color}
-          onPointerDown={(event) => {
-            if (event.button !== 0) return;
-            event.stopPropagation();
-            onSelect(object.id, event.shiftKey);
-          }}
+          object={object}
+          isSelected={selectedIds.includes(object.id)}
+          onSelectRef={onSelectRef}
+          onSelect={onSelect}
         />
       ))}
     </Instances>
+  );
+}
+
+interface InstanceItemProps {
+  object: SceneObject;
+  isSelected: boolean;
+  onSelectRef: (id: string, node: Object3D | null) => void;
+  onSelect: (id: string, additive: boolean) => void;
+}
+
+// A dedicated component (rather than an inline ref in the .map() above) so
+// the ref callback can be memoized with useCallback. An inline ref callback
+// gets a new identity every render, and React detaches+reattaches refs
+// whenever their identity changes — which, since onSelectRef ultimately
+// calls a setState in the parent, was creating an infinite
+// render -> new ref -> setState -> render loop (React error #185,
+// "Maximum update depth exceeded") that crashed the WebGL context.
+function InstanceItem({ object, isSelected, onSelectRef, onSelect }: InstanceItemProps) {
+  const setRef = useCallback(
+    (node: Object3D | null) => {
+      onSelectRef(object.id, node);
+    },
+    [object.id, onSelectRef],
+  );
+
+  return (
+    <Instance
+      ref={setRef}
+      position={object.position}
+      rotation={object.rotation}
+      scale={object.scale}
+      color={isSelected ? SELECTED_COLOR : object.material.color}
+      onPointerDown={(event) => {
+        if (event.button !== 0) return;
+        event.stopPropagation();
+        onSelect(object.id, event.shiftKey);
+      }}
+    />
   );
 }
