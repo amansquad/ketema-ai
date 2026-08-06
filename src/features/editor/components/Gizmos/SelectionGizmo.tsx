@@ -1,11 +1,16 @@
 "use client";
 
 import { TransformControls } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
 import type { Object3D } from "three";
 
 import { getAssetParts, getPrimaryPart, multiplyVectors, rotateAroundY } from "@/features/editor/lib/assetVisuals";
 import { useEditorStore } from "@/features/editor/store/useEditorStore";
 import type { Vector3Tuple } from "@/features/editor/types";
+
+interface OrbitLikeControls {
+  enabled: boolean;
+}
 
 interface SelectionGizmoProps {
   target: Object3D;
@@ -23,12 +28,28 @@ export function SelectionGizmo({ target, objectId }: SelectionGizmoProps) {
   const updateObject = useEditorStore((state) => state.updateObject);
   const assetKind = useEditorStore((state) => state.objects[objectId]?.assetKind);
 
+  // Explicitly disabling the default OrbitControls instance for the
+  // duration of a gizmo drag — rather than relying on TransformControls to
+  // cooperate with it implicitly — is the standard, documented R3F pattern;
+  // without it, a drag on the gizmo can simultaneously orbit the camera
+  // (both respond to the same left-mouse-drag), leaving the camera pointed
+  // somewhere nonsensical once you let go. `state.get` is R3F's imperative,
+  // non-reactive store accessor — using it (rather than the reactive
+  // `useThree` selector) is what makes mutating `.enabled` here legitimate.
+  const getThreeState = useThree((state) => state.get);
+  function setOrbitControlsEnabled(enabled: boolean) {
+    const controls = getThreeState().controls as unknown as OrbitLikeControls | null;
+    if (controls) controls.enabled = enabled;
+  }
+
   return (
     <TransformControls
       object={target}
       mode={transformMode}
       makeDefault={false}
+      onMouseDown={() => setOrbitControlsEnabled(false)}
       onMouseUp={() => {
+        setOrbitControlsEnabled(true);
         if (!assetKind) return;
 
         // The dragged Object3D is the primary *part*, not the object itself
