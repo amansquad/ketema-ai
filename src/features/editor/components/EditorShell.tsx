@@ -5,6 +5,7 @@ import type { DragEvent } from "react";
 
 import { AssetPalette } from "@/features/assets/components/AssetPalette";
 import { ASSET_DRAG_MIME } from "@/features/assets/lib/dnd";
+import { PropertiesPanel } from "@/features/editor/components/Panels/PropertiesPanel";
 import { EditorCanvas } from "@/features/editor/components/Scene/EditorCanvas";
 import { EditorToolbar } from "@/features/editor/components/Toolbar/EditorToolbar";
 import { useEditorKeyboardShortcuts } from "@/features/editor/hooks/useEditorKeyboardShortcuts";
@@ -40,6 +41,7 @@ export function EditorShell() {
       <EditorCanvas />
       <EditorToolbar />
       <AssetPalette />
+      <PropertiesPanel />
 
       <div className="pointer-events-none absolute bottom-4 left-4 rounded-md border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-xs text-zinc-400 backdrop-blur">
         Drag an asset onto the scene, or click to place it · Shift+click to multi-select · Del to
