@@ -8,6 +8,7 @@ import type { SceneCommand } from "@/features/ai-assistant/lib/commandSchema";
 import { getCatalogEntry } from "@/features/assets/catalog/catalog";
 import { useEditorStore } from "@/features/editor/store/useEditorStore";
 import type { AssetKind, SceneObjectDraft } from "@/features/editor/types";
+import { useTranslation } from "@/features/i18n/lib/useTranslation";
 
 const EXAMPLE_PROMPTS = ["Create a residential district.", "Build a solar farm.", "Place ten schools."];
 
@@ -32,6 +33,7 @@ function summarize(drafts: SceneObjectDraft[]): string {
 }
 
 export function AiAssistantPanel() {
+  const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(true);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -81,13 +83,13 @@ export function AiAssistantPanel() {
         className="pointer-events-auto flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900/90 px-3 py-2 text-xs font-medium text-zinc-300 shadow-lg backdrop-blur hover:bg-zinc-800 hover:text-white"
       >
         <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
-        Ask AI
+        {t.assistant.askAi}
       </button>
     );
   }
 
   return (
-    <div className="pointer-events-auto flex w-80 flex-col rounded-lg border border-zinc-800 bg-zinc-900/90 shadow-lg backdrop-blur">
+    <div className="pointer-events-auto flex w-80 max-w-[calc(100vw-2rem)] flex-col rounded-lg border border-zinc-800 bg-zinc-900/90 shadow-lg backdrop-blur">
       <button
         type="button"
         onClick={() => setCollapsed(true)}
@@ -95,7 +97,7 @@ export function AiAssistantPanel() {
       >
         <span className="flex items-center gap-1.5">
           <Bot className="h-3.5 w-3.5 text-emerald-400" />
-          AI assistant
+          {t.assistant.title}
         </span>
         <span aria-hidden>×</span>
       </button>
@@ -135,7 +137,7 @@ export function AiAssistantPanel() {
           type="text"
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          placeholder="Build a solar farm..."
+          placeholder={t.assistant.placeholder}
           className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-xs text-zinc-100 outline-none focus:border-emerald-500"
         />
         <button

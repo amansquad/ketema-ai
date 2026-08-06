@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { useMemo, type ReactNode } from "react";
 import {
@@ -63,16 +64,26 @@ export function AnalyticsOverlay({ onClose }: { onClose: () => void }) {
   const objects = useEditorStore(useShallow(selectSceneObjects));
   const hour24 = useSimulationStore((state) => state.hour24);
   const weather = useSimulationStore((state) => state.weather);
+  const prefersReducedMotion = useReducedMotion();
 
   const metrics = useMemo(() => computeCityMetrics(objects, hour24, weather), [objects, hour24, weather]);
   const series = useMemo(() => buildDailySeries(objects, weather), [objects, weather]);
   const assetMix = useMemo(() => buildAssetMix(objects), [objects]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
-      <div
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      onClick={onClose}
+      initial={prefersReducedMotion ? undefined : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.15 }}
+    >
+      <motion.div
         className="max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto rounded-xl border border-zinc-800 bg-zinc-950 p-5 shadow-2xl"
         onClick={(event) => event.stopPropagation()}
+        initial={prefersReducedMotion ? undefined : { opacity: 0, scale: 0.97, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.18, ease: "easeOut" }}
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-zinc-50">City analytics</h2>
@@ -159,7 +170,7 @@ export function AnalyticsOverlay({ onClose }: { onClose: () => void }) {
             </ResponsiveContainer>
           </ChartCard>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

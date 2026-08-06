@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { NotConfiguredNotice } from "@/components/ui/NotConfiguredNotice";
 import { SignOutButton } from "@/features/auth/components/SignOutButton";
+import { LocaleSwitcher } from "@/features/i18n/components/LocaleSwitcher";
 import { ProjectList } from "@/features/persistence/components/ProjectList";
 import type { ProjectSummary } from "@/features/persistence/hooks/useProjects";
 import { isDatabaseConfigured } from "@/lib/isDatabaseConfigured";
@@ -49,7 +50,10 @@ export default async function DashboardPage() {
     <div className="min-h-dvh bg-zinc-950">
       <header className="flex items-center justify-between border-b border-zinc-800 px-6 py-3">
         <p className="font-mono text-xs tracking-widest text-emerald-400 uppercase">Ketema AI</p>
-        <SignOutButton />
+        <div className="flex items-center gap-3">
+          <LocaleSwitcher />
+          <SignOutButton />
+        </div>
       </header>
       <ProjectList initialProjects={initialProjects} />
     </div>

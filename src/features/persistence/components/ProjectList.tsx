@@ -4,6 +4,7 @@ import { LoaderCircle, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
+import { useTranslation } from "@/features/i18n/lib/useTranslation";
 import {
   useCreateProjectMutation,
   useDeleteProjectMutation,
@@ -16,6 +17,7 @@ function formatDate(iso: string) {
 }
 
 export function ProjectList({ initialProjects }: { initialProjects: ProjectSummary[] }) {
+  const { t } = useTranslation();
   const { data: projects } = useProjectsQuery(initialProjects);
   const createProject = useCreateProjectMutation();
   const deleteProject = useDeleteProjectMutation();
@@ -24,7 +26,7 @@ export function ProjectList({ initialProjects }: { initialProjects: ProjectSumma
   return (
     <div className="mx-auto w-full max-w-4xl px-6 py-10">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-zinc-50">Your cities</h1>
+        <h1 className="text-2xl font-semibold text-zinc-50">{t.dashboard.yourCities}</h1>
       </div>
 
       <form
@@ -37,7 +39,7 @@ export function ProjectList({ initialProjects }: { initialProjects: ProjectSumma
       >
         <input
           type="text"
-          placeholder="New city name"
+          placeholder={t.dashboard.newCityName}
           value={newName}
           onChange={(event) => setNewName(event.target.value)}
           className="flex-1 rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-emerald-500"
@@ -48,13 +50,13 @@ export function ProjectList({ initialProjects }: { initialProjects: ProjectSumma
           className="flex items-center gap-1.5 rounded-md bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-950 transition-colors hover:bg-emerald-400 disabled:opacity-60"
         >
           {createProject.isPending ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-          New city
+          {t.dashboard.newCity}
         </button>
       </form>
 
       {projects?.length === 0 && (
         <p className="rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-8 text-center text-sm text-zinc-500">
-          No cities yet — create your first one above.
+          {t.dashboard.noCities}
         </p>
       )}
 
@@ -66,7 +68,9 @@ export function ProjectList({ initialProjects }: { initialProjects: ProjectSumma
           >
             <Link href={`/projects/${project.id}/editor`} className="block">
               <p className="mb-1 truncate font-medium text-zinc-100">{project.name}</p>
-              <p className="text-xs text-zinc-500">Updated {formatDate(project.updatedAt)}</p>
+              <p className="text-xs text-zinc-500">
+                {t.dashboard.updated} {formatDate(project.updatedAt)}
+              </p>
               {project.isPublic && (
                 <span className="mt-2 inline-block rounded-full bg-emerald-950 px-2 py-0.5 text-[10px] text-emerald-400">
                   Shared

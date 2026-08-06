@@ -5,13 +5,14 @@ import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 import { selectSceneObjects, useEditorStore } from "@/features/editor/store/useEditorStore";
+import { useTranslation } from "@/features/i18n/lib/useTranslation";
 import { computeCityMetrics } from "@/features/simulation/engine/metrics";
 import { useSimulationStore, type WeatherKind } from "@/features/simulation/store/useSimulationStore";
 
-const WEATHER_OPTIONS: { kind: WeatherKind; label: string; Icon: typeof Sun }[] = [
-  { kind: "clear", label: "Clear", Icon: Sun },
-  { kind: "cloudy", label: "Cloudy", Icon: Cloud },
-  { kind: "rain", label: "Rain", Icon: CloudRain },
+const WEATHER_ICONS: { kind: WeatherKind; Icon: typeof Sun }[] = [
+  { kind: "clear", Icon: Sun },
+  { kind: "cloudy", Icon: Cloud },
+  { kind: "rain", Icon: CloudRain },
 ];
 
 function formatHour(hour24: number): string {
@@ -24,6 +25,12 @@ function formatHour(hour24: number): string {
 
 export function SimulationControlPanel() {
   const [collapsed, setCollapsed] = useState(false);
+  const { t } = useTranslation();
+  const WEATHER_LABELS: Record<WeatherKind, string> = {
+    clear: t.simulation.clear,
+    cloudy: t.simulation.cloudy,
+    rain: t.simulation.rain,
+  };
 
   const running = useSimulationStore((state) => state.running);
   const hour24 = useSimulationStore((state) => state.hour24);
@@ -47,19 +54,19 @@ export function SimulationControlPanel() {
         className="pointer-events-auto flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900/90 px-3 py-2 text-xs font-medium text-zinc-300 shadow-lg backdrop-blur hover:bg-zinc-800 hover:text-white"
       >
         <Gauge className="h-3.5 w-3.5" />
-        Simulation
+        {t.simulation.title}
       </button>
     );
   }
 
   return (
-    <div className="pointer-events-auto w-72 rounded-lg border border-zinc-800 bg-zinc-900/90 shadow-lg backdrop-blur">
+    <div className="pointer-events-auto w-72 max-w-[calc(100vw-2rem)] rounded-lg border border-zinc-800 bg-zinc-900/90 shadow-lg backdrop-blur">
       <button
         type="button"
         onClick={() => setCollapsed(true)}
         className="flex w-full items-center justify-between border-b border-zinc-800 px-3 py-2.5 text-xs font-semibold tracking-wide text-zinc-400 uppercase hover:text-white"
       >
-        <span>Simulation</span>
+        <span>{t.simulation.title}</span>
         <span aria-hidden>×</span>
       </button>
 
@@ -98,32 +105,36 @@ export function SimulationControlPanel() {
       </div>
 
       <div className="flex gap-1 px-3 pb-2.5">
-        {WEATHER_OPTIONS.map(({ kind, label, Icon }) => (
+        {WEATHER_ICONS.map(({ kind, Icon }) => (
           <button
             key={kind}
             type="button"
             onClick={() => setWeather(kind)}
-            title={label}
+            title={WEATHER_LABELS[kind]}
             className={`flex flex-1 items-center justify-center gap-1 rounded-md py-1.5 text-xs transition-colors ${
               weather === kind ? "bg-emerald-500 text-zinc-950" : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
             }`}
           >
             <Icon className="h-3.5 w-3.5" />
-            {label}
+            {WEATHER_LABELS[kind]}
           </button>
         ))}
       </div>
 
       <label className="flex items-center gap-2 border-t border-zinc-800 px-3 py-2.5 text-xs text-zinc-400">
         <input type="checkbox" checked={showHeatmap} onChange={toggleHeatmap} className="accent-emerald-500" />
-        Show pollution heatmap
+        {t.simulation.showHeatmap}
       </label>
 
       <div className="grid grid-cols-2 gap-2 border-t border-zinc-800 px-3 py-2.5 text-xs">
-        <Stat icon={Users} label="Population" value={metrics.population.toLocaleString()} />
-        <Stat icon={Users} label="Jobs" value={metrics.jobs.toLocaleString()} />
-        <Stat icon={Zap} label="Energy net" value={`${metrics.netEnergyKw.toFixed(1)} kW`} />
-        <Stat icon={Droplet} label="Water/day" value={`${Math.round(metrics.waterConsumptionLitersPerDay / 1000)} m³`} />
+        <Stat icon={Users} label={t.simulation.population} value={metrics.population.toLocaleString()} />
+        <Stat icon={Users} label={t.simulation.jobs} value={metrics.jobs.toLocaleString()} />
+        <Stat icon={Zap} label={t.simulation.energyNet} value={`${metrics.netEnergyKw.toFixed(1)} kW`} />
+        <Stat
+          icon={Droplet}
+          label={t.simulation.waterPerDay}
+          value={`${Math.round(metrics.waterConsumptionLitersPerDay / 1000)} m³`}
+        />
       </div>
     </div>
   );

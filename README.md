@@ -38,8 +38,8 @@ All variables are documented in [.env.example](.env.example). Summary:
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only Supabase key (never exposed to the client) | Dashboard → Project Settings → API |
 | `DATABASE_URL` | Pooled Postgres connection string, used by the app at runtime | Dashboard → Project Settings → Database → Connection pooling |
 | `DIRECT_URL` | Direct (non-pooled) Postgres connection string, used by `prisma migrate` | Dashboard → Project Settings → Database → Connection string |
-| `AI_PROVIDER` | Which AI assistant provider adapter to use (`mock`, `anthropic`, `openai`, ...) | — |
-| `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` | Credentials for the selected AI provider | Provider dashboard |
+| `AI_PROVIDER` | Which AI assistant provider adapter to use (`mock` default, or `anthropic`) | — |
+| `ANTHROPIC_API_KEY` | Credentials for the Anthropic provider (only if `AI_PROVIDER=anthropic`) | [console.anthropic.com](https://console.anthropic.com) |
 
 ## Scripts
 
@@ -56,7 +56,18 @@ All variables are documented in [.env.example](.env.example). Summary:
 
 ## Deployment
 
-Deployable to [Vercel](https://vercel.com). Set the environment variables
-above in the Vercel project settings (Production + Preview). Prisma's
+Deployable to [Vercel](https://vercel.com). See
+[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the full walkthrough
+(environment variables, running the Prisma migration against production,
+Supabase auth redirect URLs). Short version: set the environment variables
+above in the Vercel project settings (Production + Preview) — Prisma's
 `postinstall` hook runs `prisma generate` automatically during the Vercel
-build.
+build, but `prisma migrate deploy` against `DIRECT_URL` needs to be run
+manually once.
+
+## Internationalization
+
+The primary UI (landing page, auth, dashboard, editor toolbar/panels) is
+localized in English and Amharic — see `src/features/i18n`. Switch locales
+with the EN/አማ toggle in the top-right of the landing/auth pages or the
+editor toolbar; the choice persists in `localStorage`.

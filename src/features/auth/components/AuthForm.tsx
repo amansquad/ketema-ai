@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
 import { NotConfiguredNotice } from "@/components/ui/NotConfiguredNotice";
+import { LocaleSwitcher } from "@/features/i18n/components/LocaleSwitcher";
+import { useTranslation } from "@/features/i18n/lib/useTranslation";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/isConfigured";
 
@@ -14,6 +16,7 @@ interface AuthFormProps {
 
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -50,16 +53,17 @@ export function AuthForm({ mode }: AuthFormProps) {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-zinc-950 px-6">
+    <div className="relative flex min-h-dvh items-center justify-center bg-zinc-950 px-6">
+      <LocaleSwitcher className="absolute top-4 right-4" />
       <div className="w-full max-w-sm rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
         <p className="mb-1 font-mono text-xs tracking-widest text-emerald-400 uppercase">Ketema AI</p>
         <h1 className="mb-6 text-xl font-semibold text-zinc-50">
-          {mode === "sign-in" ? "Sign in" : "Create an account"}
+          {mode === "sign-in" ? t.auth.signIn : t.auth.createAccount}
         </h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <label className="flex flex-col gap-1 text-sm text-zinc-400">
-            Email
+            {t.auth.email}
             <input
               type="email"
               required
@@ -69,7 +73,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             />
           </label>
           <label className="flex flex-col gap-1 text-sm text-zinc-400">
-            Password
+            {t.auth.password}
             <input
               type="password"
               required
@@ -87,23 +91,23 @@ export function AuthForm({ mode }: AuthFormProps) {
             disabled={loading}
             className="mt-2 rounded-md bg-emerald-500 px-4 py-2 text-sm font-semibold text-zinc-950 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "Please wait…" : mode === "sign-in" ? "Sign in" : "Sign up"}
+            {loading ? t.auth.pleaseWait : mode === "sign-in" ? t.auth.signIn : t.auth.signUp}
           </button>
         </form>
 
         <p className="mt-4 text-center text-xs text-zinc-500">
           {mode === "sign-in" ? (
             <>
-              No account?{" "}
+              {t.auth.noAccount}{" "}
               <Link href="/sign-up" className="text-emerald-400 hover:underline">
-                Sign up
+                {t.auth.signUp}
               </Link>
             </>
           ) : (
             <>
-              Already have an account?{" "}
+              {t.auth.haveAccount}{" "}
               <Link href="/sign-in" className="text-emerald-400 hover:underline">
-                Sign in
+                {t.auth.signIn}
               </Link>
             </>
           )}
