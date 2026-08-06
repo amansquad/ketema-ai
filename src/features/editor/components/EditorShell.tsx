@@ -14,6 +14,7 @@ import { useEditorStore } from "@/features/editor/store/useEditorStore";
 import type { AssetKind } from "@/features/editor/types";
 import { ShareButton } from "@/features/persistence/components/ShareButton";
 import { useProjectSync } from "@/features/persistence/hooks/useProjectSync";
+import { SimulationControlPanel } from "@/features/simulation/components/SimulationControlPanel";
 
 // "demo" is the scratch project linked from the landing page — it never
 // touches the database, so the editor works fully local-only without auth.
@@ -58,11 +59,10 @@ export function EditorShell({ projectId }: { projectId: string }) {
         </div>
       </div>
 
-      {isPersistable && (
-        <div className="pointer-events-none absolute right-4 bottom-4">
-          <ShareButton projectId={projectId} />
-        </div>
-      )}
+      <div className="pointer-events-none absolute right-4 bottom-4 flex flex-col items-end gap-2">
+        <SimulationControlPanel />
+        {isPersistable && <ShareButton projectId={projectId} />}
+      </div>
 
       {process.env.NODE_ENV === "development" && (
         <Leva collapsed titleBar={{ title: "Ketema AI — Debug" }} />
