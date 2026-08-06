@@ -1,6 +1,6 @@
 # Ketema AI
 
-**ኬተማ** ("city" in Amharic) — a browser-based 3D Smart City Digital Twin
+**ከተማ** ("city" in Amharic) — a browser-based 3D Smart City Digital Twin
 Builder. Design city districts in an in-browser 3D editor, simulate traffic,
 weather, energy and pollution, and drive edits with a natural-language AI
 assistant.
