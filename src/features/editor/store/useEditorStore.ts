@@ -24,6 +24,7 @@ interface EditorState {
 
   // Object CRUD
   addObject: (draft: SceneObjectDraft) => string;
+  addObjects: (drafts: SceneObjectDraft[]) => string[];
   updateObject: (id: string, patch: Partial<Omit<SceneObject, "id">>) => void;
   removeObjects: (ids: string[]) => void;
 
@@ -73,6 +74,21 @@ export const useEditorStore = create<EditorState>()(
         state.selectedIds = [object.id];
       });
       return object.id;
+    },
+
+    addObjects: (drafts) => {
+      const objects = drafts.map((draft) => createSceneObject(draft));
+      set((state) => {
+        state.past.push(snapshotOf(state));
+        if (state.past.length > MAX_HISTORY) state.past.shift();
+        state.future = [];
+        for (const object of objects) {
+          state.objects[object.id] = object;
+          state.objectOrder.push(object.id);
+        }
+        state.selectedIds = objects.map((object) => object.id);
+      });
+      return objects.map((object) => object.id);
     },
 
     updateObject: (id, patch) => {
