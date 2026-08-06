@@ -13,12 +13,20 @@ export default function Home() {
         A 3D digital twin editor for urban planning — place buildings, roads,
         and infrastructure, then simulate traffic, energy, and weather.
       </p>
-      <Link
-        href="/projects/demo/editor"
-        className="mt-8 rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-zinc-950 transition-colors hover:bg-emerald-400"
-      >
-        Open the editor
-      </Link>
+      <div className="mt-8 flex items-center gap-3">
+        <Link
+          href="/projects/demo/editor"
+          className="rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold text-zinc-950 transition-colors hover:bg-emerald-400"
+        >
+          Try it locally
+        </Link>
+        <Link
+          href="/dashboard"
+          className="rounded-full border border-zinc-700 px-6 py-3 text-sm font-semibold text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white"
+        >
+          Sign in &amp; save cities
+        </Link>
+      </div>
     </div>
   );
 }

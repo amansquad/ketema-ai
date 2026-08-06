@@ -9,13 +9,21 @@ import { PropertiesPanel } from "@/features/editor/components/Panels/PropertiesP
 import { EditorCanvas } from "@/features/editor/components/Scene/EditorCanvas";
 import { EditorToolbar } from "@/features/editor/components/Toolbar/EditorToolbar";
 import { useEditorKeyboardShortcuts } from "@/features/editor/hooks/useEditorKeyboardShortcuts";
-import { useEditorStore } from "@/features/editor/store/useEditorStore";
 import { screenToGroundPoint } from "@/features/editor/lib/viewport";
+import { useEditorStore } from "@/features/editor/store/useEditorStore";
 import type { AssetKind } from "@/features/editor/types";
+import { ShareButton } from "@/features/persistence/components/ShareButton";
+import { useProjectSync } from "@/features/persistence/hooks/useProjectSync";
 
-export function EditorShell() {
+// "demo" is the scratch project linked from the landing page — it never
+// touches the database, so the editor works fully local-only without auth.
+const LOCAL_ONLY_PROJECT_IDS = new Set(["demo"]);
+
+export function EditorShell({ projectId }: { projectId: string }) {
   useEditorKeyboardShortcuts();
+  useProjectSync(projectId);
   const addObject = useEditorStore((state) => state.addObject);
+  const isPersistable = !LOCAL_ONLY_PROJECT_IDS.has(projectId);
 
   function handleDragOver(event: DragEvent<HTMLDivElement>) {
     if (!event.dataTransfer.types.includes(ASSET_DRAG_MIME)) return;
@@ -43,10 +51,18 @@ export function EditorShell() {
       <AssetPalette />
       <PropertiesPanel />
 
-      <div className="pointer-events-none absolute bottom-4 left-4 rounded-md border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-xs text-zinc-400 backdrop-blur">
-        Drag an asset onto the scene, or click to place it · Shift+click to multi-select · Del to
-        delete · Ctrl+D duplicate · Ctrl+Z/Y undo/redo
+      <div className="pointer-events-none absolute bottom-4 left-4 flex items-center gap-2">
+        <div className="rounded-md border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-xs text-zinc-400 backdrop-blur">
+          Drag an asset onto the scene, or click to place it · Shift+click to multi-select · Del to
+          delete · Ctrl+D duplicate · Ctrl+Z/Y undo/redo
+        </div>
       </div>
+
+      {isPersistable && (
+        <div className="pointer-events-none absolute right-4 bottom-4">
+          <ShareButton projectId={projectId} />
+        </div>
+      )}
 
       {process.env.NODE_ENV === "development" && (
         <Leva collapsed titleBar={{ title: "Ketema AI — Debug" }} />

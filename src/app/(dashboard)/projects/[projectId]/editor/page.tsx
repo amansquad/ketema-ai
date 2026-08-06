@@ -5,10 +5,10 @@ export default async function EditorPage({
 }: {
   params: Promise<{ projectId: string }>;
 }) {
-  // Milestone 1: the editor runs entirely client-side against local state.
-  // Loading/saving `projectId` against Supabase/Prisma lands with the
-  // persistence milestone (see docs/ARCHITECTURE.md).
-  await params;
+  const { projectId } = await params;
 
-  return <EditorShell />;
+  // EditorShell/useProjectSync handles both cases: a real, owned project id
+  // loads and autosaves against Supabase/Prisma; anything else (no auth, no
+  // DB configured, or the "demo" scratch id) runs local-only.
+  return <EditorShell projectId={projectId} />;
 }
