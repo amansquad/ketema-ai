@@ -2,12 +2,14 @@
 
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
 import { AssetInstanceGroup } from "@/features/editor/components/Scene/AssetInstanceGroup";
+import { CanvasErrorBoundary, CanvasFallback } from "@/features/editor/components/Scene/CanvasErrorBoundary";
 import { Ground } from "@/features/editor/components/Scene/Ground";
 import { SceneGrid } from "@/features/editor/components/Scene/SceneGrid";
 import type { AssetKind, SceneObject } from "@/features/editor/types";
+import { hasWebGLSupport } from "@/features/editor/lib/webgl";
 import { DayNightController } from "@/features/simulation/components/DayNightController";
 import { PedestrianSimulation } from "@/features/simulation/components/PedestrianSimulation";
 import { TrafficSimulation } from "@/features/simulation/components/TrafficSimulation";
@@ -33,30 +35,37 @@ const noop = () => {};
 // it structurally.
 export function ReadOnlyCanvas({ objects }: { objects: SceneObject[] }) {
   const groups = groupByAssetKind(objects);
+  const [webglSupported] = useState(hasWebGLSupport);
+
+  if (!webglSupported) {
+    return <CanvasFallback message="WebGL isn't available in this browser." />;
+  }
 
   return (
-    <Canvas shadows dpr={[1, 2]} className="touch-none">
-      <PerspectiveCamera makeDefault position={[30, 26, 30]} fov={50} near={0.1} far={4000} />
-      <OrbitControls makeDefault enableDamping dampingFactor={0.08} minDistance={4} maxDistance={800} />
+    <CanvasErrorBoundary>
+      <Canvas shadows dpr={[1, 1.5]} gl={{ powerPreference: "high-performance", antialias: true }} className="touch-none">
+        <PerspectiveCamera makeDefault position={[30, 26, 30]} fov={50} near={0.1} far={4000} />
+        <OrbitControls makeDefault enableDamping dampingFactor={0.08} minDistance={4} maxDistance={800} />
 
-      <DayNightController />
+        <DayNightController />
 
-      <Suspense fallback={null}>
-        <Ground />
-        <SceneGrid />
-        {Array.from(groups.entries()).map(([assetKind, groupObjects]) => (
-          <AssetInstanceGroup
-            key={assetKind}
-            assetKind={assetKind}
-            objects={groupObjects}
-            selectedIds={[]}
-            onSelectRef={noop}
-            onSelect={noop}
-          />
-        ))}
-        <TrafficSimulation objects={objects} />
-        <PedestrianSimulation objects={objects} />
-      </Suspense>
-    </Canvas>
+        <Suspense fallback={null}>
+          <Ground />
+          <SceneGrid />
+          {Array.from(groups.entries()).map(([assetKind, groupObjects]) => (
+            <AssetInstanceGroup
+              key={assetKind}
+              assetKind={assetKind}
+              objects={groupObjects}
+              selectedIds={[]}
+              onSelectRef={noop}
+              onSelect={noop}
+            />
+          ))}
+          <TrafficSimulation objects={objects} />
+          <PedestrianSimulation objects={objects} />
+        </Suspense>
+      </Canvas>
+    </CanvasErrorBoundary>
   );
 }

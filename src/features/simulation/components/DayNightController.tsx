@@ -54,7 +54,7 @@ export function DayNightController() {
         intensity={lightIntensity}
         color={lightColor}
         castShadow
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-150}
         shadow-camera-right={150}
         shadow-camera-top={150}

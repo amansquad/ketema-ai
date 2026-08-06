@@ -93,7 +93,7 @@ interface Dictionary {
 export const dictionary: Record<Locale, Dictionary> = {
   en: {
     landing: {
-      tagline: "ኬተማ · Ketema AI",
+      tagline: "ከተማ · Ketema AI",
       headline: "Build a smart city, right in your browser.",
       subtitle:
         "A 3D digital twin editor for urban planning — place buildings, roads, and infrastructure, then simulate traffic, energy, and weather.",
@@ -174,7 +174,7 @@ export const dictionary: Record<Locale, Dictionary> = {
   },
   am: {
     landing: {
-      tagline: "ኬተማ · Ketema AI",
+      tagline: "ከተማ · Ketema AI",
       headline: "ብልህ ከተማን በቀጥታ በአሳሽዎ ይገንቡ።",
       subtitle: "ለከተማ ፕላን ዝግጅት የ3ዲ ዲጂታል መንትያ አርታኢ — ሕንጻዎችን፣ መንገዶችን እና መሠረተ ልማቶችን ያስቀምጡ፣ ከዚያም ትራፊክን፣ ኃይልን እና የአየር ሁኔታን ያስመስሉ።",
       tryLocally: "በአካባቢው ይሞክሩ",
