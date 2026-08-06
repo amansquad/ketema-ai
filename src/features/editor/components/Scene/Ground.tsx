@@ -20,7 +20,17 @@ export function Ground() {
       }}
     >
       <planeGeometry args={[GROUND_SIZE, GROUND_SIZE]} />
-      <meshStandardMaterial color="#26312b" roughness={1} metalness={0} />
+      {/* polygonOffset pushes this back in the depth buffer (without moving
+          it visually) so it stops z-fighting with SceneGrid's near-coplanar
+          quad — the two shimmering/"shaking" as the camera moves. */}
+      <meshStandardMaterial
+        color="#26312b"
+        roughness={1}
+        metalness={0}
+        polygonOffset
+        polygonOffsetFactor={1}
+        polygonOffsetUnits={1}
+      />
     </mesh>
   );
 }

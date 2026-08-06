@@ -44,7 +44,7 @@ export function ReadOnlyCanvas({ objects }: { objects: SceneObject[] }) {
   return (
     <CanvasErrorBoundary>
       <Canvas shadows dpr={[1, 1.5]} gl={{ powerPreference: "high-performance", antialias: true }} className="touch-none">
-        <PerspectiveCamera makeDefault position={[30, 26, 30]} fov={50} near={0.1} far={4000} />
+        <PerspectiveCamera makeDefault position={[30, 26, 30]} fov={50} near={1} far={3000} />
         <OrbitControls makeDefault enableDamping dampingFactor={0.08} minDistance={4} maxDistance={800} />
 
         <DayNightController />
