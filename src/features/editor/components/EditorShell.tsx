@@ -1,10 +1,11 @@
 "use client";
 
 import { Leva } from "leva";
-import type { DragEvent } from "react";
+import { useState, type DragEvent } from "react";
 
 import { AssetPalette } from "@/features/assets/components/AssetPalette";
 import { ASSET_DRAG_MIME } from "@/features/assets/lib/dnd";
+import { AnalyticsOverlay } from "@/features/dashboard/components/AnalyticsOverlay";
 import { PropertiesPanel } from "@/features/editor/components/Panels/PropertiesPanel";
 import { EditorCanvas } from "@/features/editor/components/Scene/EditorCanvas";
 import { EditorToolbar } from "@/features/editor/components/Toolbar/EditorToolbar";
@@ -25,6 +26,7 @@ export function EditorShell({ projectId }: { projectId: string }) {
   useProjectSync(projectId);
   const addObject = useEditorStore((state) => state.addObject);
   const isPersistable = !LOCAL_ONLY_PROJECT_IDS.has(projectId);
+  const [analyticsOpen, setAnalyticsOpen] = useState(false);
 
   function handleDragOver(event: DragEvent<HTMLDivElement>) {
     if (!event.dataTransfer.types.includes(ASSET_DRAG_MIME)) return;
@@ -48,9 +50,10 @@ export function EditorShell({ projectId }: { projectId: string }) {
       onDrop={handleDrop}
     >
       <EditorCanvas />
-      <EditorToolbar />
+      <EditorToolbar onOpenAnalytics={() => setAnalyticsOpen(true)} />
       <AssetPalette />
       <PropertiesPanel />
+      {analyticsOpen && <AnalyticsOverlay onClose={() => setAnalyticsOpen(false)} />}
 
       <div className="pointer-events-none absolute bottom-4 left-4 flex items-center gap-2">
         <div className="rounded-md border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-xs text-zinc-400 backdrop-blur">

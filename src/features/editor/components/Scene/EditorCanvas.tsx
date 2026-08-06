@@ -1,6 +1,6 @@
 "use client";
 
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, PerspectiveCamera, Stats } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 
@@ -19,6 +19,7 @@ export function EditorCanvas() {
       <OrbitControls makeDefault enableDamping dampingFactor={0.08} minDistance={4} maxDistance={800} />
 
       <DayNightController />
+      {process.env.NODE_ENV === "development" && <Stats className="!left-auto !right-0" />}
 
       <Suspense fallback={null}>
         <SceneContent />

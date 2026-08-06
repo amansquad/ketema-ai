@@ -55,6 +55,9 @@ export interface CityMetrics {
   netEnergyKw: number;
   waterConsumptionLitersPerDay: number;
   pollutionIndex: number; // unbounded-ish score, higher = worse
+  roadCount: number;
+  vehicleEstimate: number;
+  trafficDensity: number; // vehicles per road segment — a congestion proxy
 }
 
 export function computeCityMetrics(objects: SceneObject[], hour24: number, weather: WeatherKind): CityMetrics {
@@ -90,6 +93,13 @@ export function computeCityMetrics(objects: SceneObject[], hour24: number, weath
   }
   pollutionIndex = Math.max(0, pollutionIndex);
 
+  // Rough trip-generation model: a fraction of residents/workers are "on the
+  // road" at once, peaking at commute hours (roughly following daylight).
+  const roadCount = counts.road ?? 0;
+  const commuteFactor = 0.15 + daylight * 0.35;
+  const vehicleEstimate = (population * 0.06 + jobs * 0.1) * commuteFactor;
+  const trafficDensity = vehicleEstimate / Math.max(1, roadCount);
+
   return {
     population,
     jobs,
@@ -98,6 +108,9 @@ export function computeCityMetrics(objects: SceneObject[], hour24: number, weath
     netEnergyKw: energyProductionKw - energyConsumptionKw,
     waterConsumptionLitersPerDay,
     pollutionIndex,
+    roadCount,
+    vehicleEstimate,
+    trafficDensity,
   };
 }
 

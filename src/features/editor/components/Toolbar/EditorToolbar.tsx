@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Move, Redo2, RotateCw, Scaling, Trash2, Undo2 } from "lucide-react";
+import { ChartColumn, Copy, Move, Redo2, RotateCw, Scaling, Trash2, Undo2 } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 
 import { useEditorStore } from "@/features/editor/store/useEditorStore";
@@ -42,7 +42,7 @@ function ToolbarButton({
   );
 }
 
-export function EditorToolbar() {
+export function EditorToolbar({ onOpenAnalytics }: { onOpenAnalytics: () => void }) {
   const transformMode = useEditorStore((state) => state.transformMode);
   const setTransformMode = useEditorStore((state) => state.setTransformMode);
   const undo = useEditorStore((state) => state.undo);
@@ -83,6 +83,12 @@ export function EditorToolbar() {
         </ToolbarButton>
         <ToolbarButton title="Delete (Del)" onClick={deleteSelected} disabled={!hasSelection}>
           <Trash2 className="h-4 w-4" />
+        </ToolbarButton>
+
+        <div className="mx-1 h-6 w-px bg-zinc-700" />
+
+        <ToolbarButton title="City analytics" onClick={onOpenAnalytics}>
+          <ChartColumn className="h-4 w-4" />
         </ToolbarButton>
       </div>
     </div>
