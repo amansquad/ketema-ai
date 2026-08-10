@@ -34,10 +34,44 @@ export const ASSET_DEFAULTS: Record<AssetKind, AssetDefaults> = {
   mosque: { label: "Mosque", scale: [8, 10, 8], color: "#5e9c8f", roughness: 0.5, metalness: 0.1 },
   mountain: { label: "Mountain", scale: [20, 15, 20], color: "#6b6b5f", roughness: 1, metalness: 0 },
   river: { label: "River", scale: [6, 0.1, 30], color: "#3d7bb0", roughness: 0.1, metalness: 0.1 },
+  bridge: { label: "Bridge", scale: [24, 4, 5], color: "#9a9488", roughness: 0.8, metalness: 0.05 },
+  stadium: { label: "Stadium", scale: [16, 8, 12], color: "#b8b2a6", roughness: 0.6, metalness: 0.1 },
+  fountain: { label: "Fountain", scale: [5, 1.5, 5], color: "#a8a49b", roughness: 0.4, metalness: 0.15 },
+  lake: { label: "Lake", scale: [30, 0.1, 20], color: "#3d7bb0", roughness: 0.1, metalness: 0.1 },
+  warehouse: { label: "Warehouse", scale: [10, 5, 8], color: "#8a857d", roughness: 0.7, metalness: 0.15 },
+  "market-stall": { label: "Market Stall", scale: [3, 2.6, 2.4], color: "#c1443b", roughness: 0.8, metalness: 0 },
+  "clock-tower": { label: "Clock Tower", scale: [2.6, 11, 2.6], color: "#9a9488", roughness: 0.7, metalness: 0.05 },
+  well: { label: "Water Well", scale: [2.2, 1.8, 2.2], color: "#8a8478", roughness: 0.9, metalness: 0 },
+  obelisk: { label: "Obelisk", scale: [1.6, 10, 1.6], color: "#a8a196", roughness: 0.85, metalness: 0 },
+  "bus-station": { label: "Bus Station", scale: [6, 3, 3.5], color: "#6b6660", roughness: 0.6, metalness: 0.1 },
+  "grain-silo": { label: "Grain Silo", scale: [3.5, 9, 3.5], color: "#c9c4ba", roughness: 0.4, metalness: 0.5 },
+  "railway-station": { label: "Railway Station", scale: [12, 6, 7], color: "#8a6a4a", roughness: 0.6, metalness: 0.1 },
 };
+
+// Per-kind initial-transform variety, so repeated objects don't start as
+// identical clones: the mountain gets a random spin (its facets and noise
+// texture are asymmetric), and trees get a slightly randomized size so
+// forests look less uniform (their canopies are further varied per object at
+// render time — see objectVariation.ts). Only applied when the caller
+// didn't specify that part of the transform.
+function defaultTransform(assetKind: AssetKind): { rotation: Vector3Tuple; scale: Vector3Tuple } {
+  const defaults = ASSET_DEFAULTS[assetKind];
+  if (assetKind === "mountain") {
+    return { rotation: [0, Math.random() * Math.PI * 2, 0], scale: defaults.scale };
+  }
+  if (assetKind === "tree") {
+    const jitter = 0.9 + Math.random() * 0.2; // ±10%
+    return {
+      rotation: [0, 0, 0],
+      scale: [defaults.scale[0] * jitter, defaults.scale[1] * jitter, defaults.scale[2] * jitter],
+    };
+  }
+  return { rotation: [0, 0, 0], scale: defaults.scale };
+}
 
 export function createSceneObject(draft: SceneObjectDraft): SceneObject {
   const defaults = ASSET_DEFAULTS[draft.assetKind];
+  const initial = defaultTransform(draft.assetKind);
   const now = Date.now();
 
   return {
@@ -45,8 +79,8 @@ export function createSceneObject(draft: SceneObjectDraft): SceneObject {
     assetKind: draft.assetKind,
     name: draft.name ?? defaults.label,
     position: draft.position ?? [0, 0, 0],
-    rotation: draft.rotation ?? [0, 0, 0],
-    scale: draft.scale ?? defaults.scale,
+    rotation: draft.rotation ?? initial.rotation,
+    scale: draft.scale ?? initial.scale,
     material: draft.material ?? {
       color: defaults.color,
       roughness: defaults.roughness,

@@ -4,7 +4,14 @@ import { TransformControls } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import type { Object3D } from "three";
 
-import { getAssetParts, getPrimaryPart, multiplyVectors, rotateAroundY } from "@/features/editor/lib/assetVisuals";
+import {
+  getAssetParts,
+  getPrimaryPart,
+  invertComposeRotations,
+  multiplyVectors,
+  rotateAroundY,
+} from "@/features/editor/lib/assetVisuals";
+import { getPartVariation, unapplyVariation } from "@/features/editor/lib/objectVariation";
 import { useEditorStore } from "@/features/editor/store/useEditorStore";
 import type { Vector3Tuple } from "@/features/editor/types";
 
@@ -64,12 +71,26 @@ export function SelectionGizmo({ target, objectId }: SelectionGizmoProps) {
         const parts = getAssetParts(assetKind);
         const primaryPart = getPrimaryPart(parts);
 
+        // The primary part may carry a deterministic per-object variation
+        // (e.g. tree foliage size/tilt jitter) in addition to the part's own
+        // fixed transform — undo both so the stored object transform never
+        // accumulates them.
+        const variation = getPartVariation(objectId, primaryPart);
+        const scaleMul = variation?.scaleMul ?? 1;
+
         const scale: Vector3Tuple = [
-          target.scale.x / primaryPart.scale[0],
-          target.scale.y / primaryPart.scale[1],
-          target.scale.z / primaryPart.scale[2],
+          target.scale.x / primaryPart.scale[0] / scaleMul,
+          target.scale.y / primaryPart.scale[1] / scaleMul,
+          target.scale.z / primaryPart.scale[2] / scaleMul,
         ];
-        const rotation: Vector3Tuple = [target.rotation.x, target.rotation.y, target.rotation.z];
+        // The primary part's fixed tilt is applied *before* the object's own
+        // rotation (see composeRotations), so invert it to recover the object's
+        // true rotation; parts without a rotation pass straight through.
+        const recoveredRotation = invertComposeRotations(
+          [target.rotation.x, target.rotation.y, target.rotation.z],
+          primaryPart.rotation,
+        );
+        const rotation: Vector3Tuple = variation ? unapplyVariation(recoveredRotation, variation) : recoveredRotation;
         const worldOffset = rotateAroundY(multiplyVectors(scale, primaryPart.offset), rotation[1]);
         const position: Vector3Tuple = [
           target.position.x - worldOffset[0],

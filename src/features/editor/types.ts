@@ -23,7 +23,19 @@ export type AssetKind =
   | "church"
   | "mosque"
   | "mountain"
-  | "river";
+  | "river"
+  | "bridge"
+  | "stadium"
+  | "fountain"
+  | "lake"
+  | "warehouse"
+  | "market-stall"
+  | "clock-tower"
+  | "well"
+  | "obelisk"
+  | "bus-station"
+  | "grain-silo"
+  | "railway-station";
 
 export interface SceneObjectMaterial {
   color: string; // hex, e.g. "#8899aa"

@@ -22,6 +22,18 @@ const ASSET_KINDS = [
   "mosque",
   "mountain",
   "river",
+  "bridge",
+  "stadium",
+  "fountain",
+  "lake",
+  "warehouse",
+  "market-stall",
+  "clock-tower",
+  "well",
+  "obelisk",
+  "bus-station",
+  "grain-silo",
+  "railway-station",
 ] as const;
 
 export const AssetKindSchema = z.enum(ASSET_KINDS);

@@ -97,8 +97,9 @@ export function AnalyticsOverlay({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-6">
-          <StatTile label="Population" value={metrics.population.toLocaleString()} />
+        <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+          <StatTile label="Residents" value={metrics.residents.toLocaleString()} />
+          <StatTile label="Event capacity" value={metrics.eventVisitors.toLocaleString()} />
           <StatTile label="Jobs" value={metrics.jobs.toLocaleString()} />
           <StatTile label="Net energy" value={`${metrics.netEnergyKw.toFixed(1)} kW`} />
           <StatTile label="Water / day" value={`${Math.round(metrics.waterConsumptionLitersPerDay / 1000)} m³`} />

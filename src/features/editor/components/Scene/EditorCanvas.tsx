@@ -2,6 +2,7 @@
 
 import { OrbitControls, PerspectiveCamera, Stats } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
+import { Bloom, EffectComposer, N8AO, Vignette } from "@react-three/postprocessing";
 import { Suspense, useState } from "react";
 
 import { CanvasErrorBoundary, CanvasFallback } from "@/features/editor/components/Scene/CanvasErrorBoundary";
@@ -43,6 +44,27 @@ export function EditorCanvas() {
           <PedestrianSimulation />
           <PollutionHeatmap />
         </Suspense>
+
+        {/* Post-processing is purely a render pass over the composed frame — it
+            never intercepts pointer events, so the instanced-mesh selection
+            raycasting and gizmo dragging above are unaffected. Kept
+            conservative for a real-time editor: N8AO's "performance" quality
+            is the cheapest tier (this is what buys back most of the "flat"
+            look, by darkening creases between buildings/props that direct
+            light alone can't shade), Bloom only catches genuinely bright
+            pixels (sun, lit windows, water highlights) rather than blooming
+            the whole scene, and Vignette is subtle enough to add depth
+            without reading as a filter. */}
+        <EffectComposer multisampling={0}>
+          <N8AO aoRadius={2} distanceFalloff={1} intensity={2} quality="performance" />
+          <Bloom
+            luminanceThreshold={0.85}
+            luminanceSmoothing={0.2}
+            intensity={0.4}
+            mipmapBlur
+          />
+          <Vignette eskil={false} offset={0.15} darkness={0.5} />
+        </EffectComposer>
       </Canvas>
     </CanvasErrorBoundary>
   );

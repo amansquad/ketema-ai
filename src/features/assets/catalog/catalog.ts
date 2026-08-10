@@ -44,7 +44,18 @@ export interface AssetCatalogEntry {
     | "Church"
     | "Mosque"
     | "Mountain"
-    | "WavesHorizontal";
+    | "WavesHorizontal"
+    | "Waypoints"
+    | "Torus"
+    | "CircleDot"
+    | "Waves"
+    | "Warehouse"
+    | "Store"
+    | "Clock"
+    | "Milestone"
+    | "Bus"
+    | "Wheat"
+    | "TrainFront";
   defaultTags: string[];
 }
 
@@ -192,6 +203,102 @@ export const ASSET_CATALOG: AssetCatalogEntry[] = [
     description: "Waterway feature, e.g. Blue Nile / Abay-style river.",
     iconName: "WavesHorizontal",
     defaultTags: ["ethiopia", "terrain", "water"],
+  },
+  {
+    kind: "bridge",
+    label: "Bridge",
+    category: "infrastructure",
+    description: "Span across rivers or valleys — connects the road network.",
+    iconName: "Waypoints",
+    defaultTags: ["infrastructure", "connectivity"],
+  },
+  {
+    kind: "stadium",
+    label: "Stadium",
+    category: "civic",
+    description: "Sports arena — landmark venue; adds event-day population.",
+    iconName: "Torus",
+    defaultTags: ["civic", "recreation", "landmark", "population"],
+  },
+  {
+    kind: "fountain",
+    label: "Fountain",
+    category: "nature",
+    description: "Ornamental water feature — improves local air quality.",
+    iconName: "CircleDot",
+    defaultTags: ["nature", "water", "recreation", "air-quality"],
+  },
+  {
+    kind: "lake",
+    label: "Lake",
+    category: "nature",
+    description: "Freshwater body — blue space that improves air quality.",
+    iconName: "Waves",
+    defaultTags: ["nature", "water", "air-quality"],
+  },
+  {
+    kind: "warehouse",
+    label: "Warehouse",
+    category: "infrastructure",
+    description: "Industrial storage and logistics — provides warehouse jobs and emits industrial emissions.",
+    iconName: "Warehouse",
+    defaultTags: ["infrastructure", "industry", "jobs"],
+  },
+  {
+    kind: "market-stall",
+    label: "Market Stall",
+    category: "buildings",
+    description: "Open-air bazaar stall, e.g. Merkato-style trading — small commercial jobs contributor.",
+    iconName: "Store",
+    defaultTags: ["commercial", "jobs", "ethiopia", "market"],
+  },
+  {
+    kind: "clock-tower",
+    label: "Clock Tower",
+    category: "civic",
+    description: "Ornamental civic landmark that anchors a town square.",
+    iconName: "Clock",
+    defaultTags: ["civic", "landmark"],
+  },
+  {
+    kind: "well",
+    label: "Water Well",
+    category: "utilities",
+    description: "Communal borehole well — small-scale water infrastructure.",
+    iconName: "Droplets",
+    defaultTags: ["utilities", "water"],
+  },
+  {
+    kind: "obelisk",
+    label: "Obelisk",
+    category: "ethiopia",
+    description: "Carved stone stele with a gilded tip, e.g. Axum-style obelisk — distinct from the general monument.",
+    iconName: "Milestone",
+    defaultTags: ["ethiopia", "culture", "landmark"],
+  },
+  {
+    kind: "bus-station",
+    label: "Bus Station",
+    category: "infrastructure",
+    description: "Minibus/bus stop with shelter — transit hub for the traffic simulation.",
+    iconName: "Bus",
+    defaultTags: ["infrastructure", "traffic", "transit"],
+  },
+  {
+    kind: "grain-silo",
+    label: "Grain Silo",
+    category: "infrastructure",
+    description: "Grain storage and milling — industrial jobs, like a smaller warehouse.",
+    iconName: "Wheat",
+    defaultTags: ["infrastructure", "industry", "jobs"],
+  },
+  {
+    kind: "railway-station",
+    label: "Railway Station",
+    category: "infrastructure",
+    description: "Passenger rail terminal, e.g. Addis Ababa–Djibouti line-style station — transit jobs hub.",
+    iconName: "TrainFront",
+    defaultTags: ["infrastructure", "transit", "jobs"],
   },
 ];
 

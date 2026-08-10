@@ -8,6 +8,8 @@ import { useShallow } from "zustand/react/shallow";
 
 import { selectSceneObjects, useEditorStore } from "@/features/editor/store/useEditorStore";
 import type { SceneObject } from "@/features/editor/types";
+import { isWeatherActive, WEATHER_TRAFFIC } from "@/features/simulation/lib/weatherVisuals";
+import { useSimulationStore } from "@/features/simulation/store/useSimulationStore";
 
 const VEHICLE_COLORS = ["#e2e2e2", "#3a6bd6", "#c94b4b", "#e0b429"];
 
@@ -46,6 +48,12 @@ function buildVehicles(roads: SceneObject[]): Vehicle[] {
 // length. Positions are mutated directly on each Instance's Object3D every
 // frame (not via React state/props) so hundreds of vehicles cost no re-renders.
 //
+// The weather drives how the street feels: WEATHER_TRAFFIC.speed slows the
+// oscillation (cars crawl in a storm, snow, fog, or dust) and WEATHER_TRAFFIC
+// .density hides a deterministic fraction of vehicles — each car's stable
+// phase doubles as its hash — so bad weather visibly empties the roads.
+// Hidden cars are scaled to zero so they also stop casting shadows.
+//
 // Pass `objects` explicitly for a read-only viewer rendering a fetched scene
 // (the shared-link page) that never populated the live editor store; omit it
 // in the editor itself to read the store directly.
@@ -60,14 +68,29 @@ export function TrafficSimulation({ objects }: { objects?: SceneObject[] } = {})
   const vehicles = useMemo(() => buildVehicles(roads), [roads]);
   const refs = useRef<(Object3D | null)[]>([]);
 
+  const weather = useSimulationStore((state) => state.weather);
+  const activity = WEATHER_TRAFFIC[weather];
+
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     for (let i = 0; i < vehicles.length; i++) {
       const node = refs.current[i];
       const vehicle = vehicles[i];
-      if (!node || vehicle.halfLength <= 0) continue;
+      if (!node) continue;
 
-      const offset = Math.sin(t * vehicle.speed + vehicle.phase) * vehicle.halfLength;
+      // Deterministic per-vehicle "who is out" from its stable phase; hidden
+      // cars are scaled to zero (and stop casting shadows). This runs before
+      // the half-length guard so even stub-road cars clear out in bad weather.
+      const onRoad = isWeatherActive(vehicle.phase, activity.density);
+      if (!onRoad) {
+        node.scale.setScalar(0);
+        continue;
+      }
+      node.scale.setScalar(1);
+      if (vehicle.halfLength <= 0) continue;
+
+      const offset =
+        Math.sin(t * vehicle.speed * activity.speed + vehicle.phase) * vehicle.halfLength;
       node.position.set(
         vehicle.originX + vehicle.forwardX * offset,
         0.4,

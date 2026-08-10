@@ -1,7 +1,7 @@
 "use client";
 
 import { Leva } from "leva";
-import { useState, type DragEvent } from "react";
+import { useEffect, useState, type DragEvent } from "react";
 
 import { AiAssistantPanel } from "@/features/ai-assistant/components/AiAssistantPanel";
 import { AssetPalette } from "@/features/assets/components/AssetPalette";
@@ -12,22 +12,35 @@ import { EditorCanvas } from "@/features/editor/components/Scene/EditorCanvas";
 import { EditorToolbar } from "@/features/editor/components/Toolbar/EditorToolbar";
 import { useEditorKeyboardShortcuts } from "@/features/editor/hooks/useEditorKeyboardShortcuts";
 import { screenToGroundPoint } from "@/features/editor/lib/viewport";
-import { useEditorStore } from "@/features/editor/store/useEditorStore";
+import { selectSceneObjects, useEditorStore } from "@/features/editor/store/useEditorStore";
 import type { AssetKind } from "@/features/editor/types";
+import { buildDemoScene } from "@/features/persistence/lib/demoScene";
+import { isLocalOnlyProject } from "@/features/persistence/lib/localProjects";
 import { ShareButton } from "@/features/persistence/components/ShareButton";
 import { useProjectSync } from "@/features/persistence/hooks/useProjectSync";
+import { PollutionHeatmapLegend } from "@/features/simulation/components/PollutionHeatmapLegend";
 import { SimulationControlPanel } from "@/features/simulation/components/SimulationControlPanel";
-
-// "demo" is the scratch project linked from the landing page — it never
-// touches the database, so the editor works fully local-only without auth.
-const LOCAL_ONLY_PROJECT_IDS = new Set(["demo"]);
 
 export function EditorShell({ projectId }: { projectId: string }) {
   useEditorKeyboardShortcuts();
   useProjectSync(projectId);
   const addObject = useEditorStore((state) => state.addObject);
-  const isPersistable = !LOCAL_ONLY_PROJECT_IDS.has(projectId);
+  // Scratch ids like "demo" never touch the database, so the editor runs
+  // fully local-only without auth (and hides the share/persist controls).
+  const isPersistable = !isLocalOnlyProject(projectId);
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
+
+  // Local-only scratch projects open on a seeded starter city so the editor
+  // isn't an empty void. Seeds only an empty scene — anything the user has
+  // placed is left untouched.
+  useEffect(() => {
+    if (!isLocalOnlyProject(projectId)) return;
+    const store = useEditorStore.getState();
+    if (selectSceneObjects(store).length === 0) {
+      store.addObjects(buildDemoScene());
+      store.clearSelection();
+    }
+  }, [projectId]);
 
   function handleDragOver(event: DragEvent<HTMLDivElement>) {
     if (!event.dataTransfer.types.includes(ASSET_DRAG_MIME)) return;
@@ -65,6 +78,7 @@ export function EditorShell({ projectId }: { projectId: string }) {
       </div>
 
       <div className="pointer-events-none absolute right-4 bottom-4 flex flex-col items-end gap-2">
+        <PollutionHeatmapLegend />
         <SimulationControlPanel />
         {isPersistable && <ShareButton projectId={projectId} />}
       </div>

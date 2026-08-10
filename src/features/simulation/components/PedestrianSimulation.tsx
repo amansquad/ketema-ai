@@ -8,6 +8,8 @@ import { useShallow } from "zustand/react/shallow";
 
 import { selectSceneObjects, useEditorStore } from "@/features/editor/store/useEditorStore";
 import type { AssetKind, SceneObject } from "@/features/editor/types";
+import { isWeatherActive, WEATHER_PEDESTRIANS } from "@/features/simulation/lib/weatherVisuals";
+import { useSimulationStore } from "@/features/simulation/store/useSimulationStore";
 
 const PEDESTRIAN_ANCHOR_KINDS = new Set<AssetKind>([
   "park",
@@ -52,19 +54,32 @@ function buildPedestrians(anchors: SceneObject[]): Pedestrian[] {
 // a small looping path around its anchor (two out-of-phase sine waves —
 // cheap, deterministic, no physics needed for a planning-tool visualization).
 //
+// The weather clears the streets: WEATHER_PEDESTRIANS.density hides a
+// deterministic fraction of people (storm, snow, and dust empty the sidewalks
+// — everyone stays inside), and .speed slows whoever is still out. Each
+// pedestrian's stable phase doubles as its hash, so who stays home is stable
+// while a weather lasts. Hidden people are scaled to zero so they stop
+// casting shadows too.
+//
 // Pass `objects` explicitly for a read-only viewer rendering a fetched scene
 // (the shared-link page) that never populated the live editor store; omit it
 // in the editor itself to read the store directly.
 export function PedestrianSimulation({ objects }: { objects?: SceneObject[] } = {}) {
   const storeAnchors = useEditorStore(
-    useShallow((state) => selectSceneObjects(state).filter((o) => PEDESTRIAN_ANCHOR_KINDS.has(o.assetKind))),
+    useShallow((state) =>
+      selectSceneObjects(state).filter((o) => PEDESTRIAN_ANCHOR_KINDS.has(o.assetKind)),
+    ),
   );
   const anchors = useMemo(
-    () => (objects ? objects.filter((o) => PEDESTRIAN_ANCHOR_KINDS.has(o.assetKind)) : storeAnchors),
+    () =>
+      objects ? objects.filter((o) => PEDESTRIAN_ANCHOR_KINDS.has(o.assetKind)) : storeAnchors,
     [objects, storeAnchors],
   );
   const pedestrians = useMemo(() => buildPedestrians(anchors), [anchors]);
   const refs = useRef<(Object3D | null)[]>([]);
+
+  const weather = useSimulationStore((state) => state.weather);
+  const activity = WEATHER_PEDESTRIANS[weather];
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
@@ -73,7 +88,15 @@ export function PedestrianSimulation({ objects }: { objects?: SceneObject[] } = 
       const pedestrian = pedestrians[i];
       if (!node) continue;
 
-      const angle = t * pedestrian.speed + pedestrian.phase;
+      // Deterministic per-person "who is out" from their stable phase.
+      const outside = isWeatherActive(pedestrian.phase, activity.density);
+      if (!outside) {
+        node.scale.setScalar(0);
+        continue;
+      }
+      node.scale.setScalar(1);
+
+      const angle = t * pedestrian.speed * activity.speed + pedestrian.phase;
       node.position.set(
         pedestrian.centerX + Math.cos(angle) * pedestrian.radius,
         0.9,

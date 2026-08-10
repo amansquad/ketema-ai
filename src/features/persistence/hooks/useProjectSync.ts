@@ -6,6 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 
 import { selectSceneObjects, useEditorStore } from "@/features/editor/store/useEditorStore";
 import type { SceneObject } from "@/features/editor/types";
+import { isLocalOnlyProject } from "@/features/persistence/lib/localProjects";
 
 const AUTOSAVE_DEBOUNCE_MS = 1500;
 
@@ -42,9 +43,13 @@ export function useProjectSync(projectId: string) {
   const hasLoadedRef = useRef(false);
   const isPersistedRef = useRef(false);
 
+  // Local-only ids (e.g. the "demo" scratch project) never hit the API — an
+  // unauthenticated browser would otherwise fire a request that 401s before
+  // the hook falls back to local-only. Real ids still resolve normally.
   const { data: project } = useQuery({
     queryKey: ["project", projectId],
     queryFn: () => fetchProject(projectId),
+    enabled: !isLocalOnlyProject(projectId),
     retry: false,
   });
 

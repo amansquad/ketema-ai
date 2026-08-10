@@ -1,11 +1,26 @@
 "use client";
 
 import { Instance, Instances } from "@react-three/drei";
-import { useCallback } from "react";
-import type { Object3D } from "three";
-
+import { useCallback, useMemo } from "react";
+import type { Object3D } from "three";import { makeNoiseTexture } from "@/features/editor/lib/proceduralTexture";
+import { getPartVariation } from "@/features/editor/lib/objectVariation";
 import { ASSET_DEFAULTS } from "@/features/editor/lib/createSceneObject";
+
+// Part definitions are module-level constants, so a WeakMap keyed by the part
+// object caches each generated texture across group mounts/remounts instead of
+// redrawing the 256×256 canvas every time.
+const partTextureCache = new WeakMap<AssetPart, ReturnType<typeof makeNoiseTexture>>();
+
+function getPartTexture(part: AssetPart) {
+  if (!part.texture) return null;
+  const cached = partTextureCache.get(part);
+  if (cached) return cached;
+  const texture = makeNoiseTexture(part.texture);
+  partTextureCache.set(part, texture);
+  return texture;
+}
 import {
+  composeRotations,
   getAssetParts,
   getPrimaryPart,
   multiplyVectors,
@@ -14,7 +29,10 @@ import {
 } from "@/features/editor/lib/assetVisuals";
 import type { AssetKind, SceneObject, Vector3Tuple } from "@/features/editor/types";
 
-const FLAT_ASSETS = new Set<AssetKind>(["road", "park", "river", "solar-panel"]);
+// Assets that lie flat on the ground (so casting a shadow would just paint a
+// dark smear beside them) — solar panels are deliberately excluded now that
+// they're rendered as tilted panels.
+const FLAT_ASSETS = new Set<AssetKind>(["road", "park", "river", "lake"]);
 
 const SELECTED_COLOR = "#ffb020";
 
@@ -86,13 +104,28 @@ function PartInstances({
   onSelectRef,
   onSelect,
 }: PartInstancesProps) {
+  // Parts may carry a procedural noise texture (e.g. rocky mountain cliffs).
+  const map = useMemo(() => getPartTexture(part), [part]);
+
   return (
     <Instances limit={objects.length} range={objects.length} castShadow={castShadow} receiveShadow>
       {part.geometry === "cylinder" && <cylinderGeometry args={part.args} />}
       {part.geometry === "cone" && <coneGeometry args={part.args} />}
       {part.geometry === "sphere" && <sphereGeometry args={part.args} />}
       {part.geometry === "box" && <boxGeometry args={part.args} />}
-      <meshStandardMaterial roughness={roughness} metalness={metalness} />
+      {/* Negative polygonOffset pushes part geometry slightly toward the camera in
+          the depth buffer, so faces resting exactly on the ground plane (building
+          bases, roads, parks) never z-fight with the ground — whose own positive
+          offset pushes it back. On the textured ground that flicker is visible as
+          the "shaking" around newly placed objects. */}
+      <meshStandardMaterial
+        roughness={roughness}
+        metalness={metalness}
+        map={map ?? undefined}
+        polygonOffset
+        polygonOffsetFactor={-1}
+        polygonOffsetUnits={-1}
+      />
       {objects.map((object) => (
         <PartInstanceItem
           key={object.id}
@@ -128,6 +161,11 @@ function PartInstanceItem({ object, part, isSelected, onSelectRef, onSelect }: P
     [object.id, onSelectRef],
   );
 
+  // Parts marked `varied` (tree foliage) get a deterministic per-object size
+  // and tilt jitter so a forest doesn't look uniform. Deterministic from the
+  // object id, so it's stable across renders — and the gizmo un-applies it.
+  const variation = getPartVariation(object.id, part);
+
   const localOffset = multiplyVectors(object.scale, part.offset);
   const worldOffset = rotateAroundY(localOffset, object.rotation[1]);
   const position: Vector3Tuple = [
@@ -136,13 +174,26 @@ function PartInstanceItem({ object, part, isSelected, onSelectRef, onSelect }: P
     object.position[2] + worldOffset[2],
   ];
   const scale = multiplyVectors(object.scale, part.scale);
+  if (variation) {
+    scale[0] *= variation.scaleMul;
+    scale[1] *= variation.scaleMul;
+    scale[2] *= variation.scaleMul;
+  }
+  // Keep the zero-allocation fast path in composeRotations for the common
+  // case (no part rotation, no variation) by passing undefined.
+  let partRotation: Vector3Tuple | undefined = part.rotation ? [...part.rotation] : undefined;
+  if (variation) {
+    partRotation ??= [0, 0, 0];
+    partRotation[0] += variation.tilt;
+  }
+  const rotation = composeRotations(object.rotation, partRotation);
   const color = isSelected ? SELECTED_COLOR : (part.color ?? object.material.color);
 
   return (
     <Instance
       ref={setRef}
       position={position}
-      rotation={object.rotation}
+      rotation={rotation}
       scale={scale}
       color={color}
       onPointerDown={(event) => {

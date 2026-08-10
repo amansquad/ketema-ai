@@ -5,7 +5,7 @@ export const LOCALES: { code: Locale; label: string; nativeLabel: string }[] = [
   { code: "am", label: "Amharic", nativeLabel: "አማ" },
 ];
 
-interface Dictionary {
+export interface Dictionary {
   landing: {
     tagline: string;
     headline: string;
@@ -72,12 +72,32 @@ interface Dictionary {
     title: string;
     clear: string;
     cloudy: string;
+    overcast: string;
     rain: string;
+    drizzle: string;
+    storm: string;
+    snow: string;
+    fog: string;
+    haze: string;
+    dust: string;
+    windy: string;
+    randomWeather: string;
+    autoWeather: string;
+    seasonLabel: string;
+    seasonKiremt: string;
+    seasonTseday: string;
+    seasonBega: string;
+    seasonBelg: string;
     showHeatmap: string;
-    population: string;
+    residents: string;
+    eventCapacity: string;
     jobs: string;
     energyNet: string;
     waterPerDay: string;
+    heatmapTitle: string;
+    intensityLow: string;
+    intensityHigh: string;
+    weatherScaling: string;
   };
   assistant: {
     title: string;
@@ -159,12 +179,33 @@ export const dictionary: Record<Locale, Dictionary> = {
       title: "Simulation",
       clear: "Clear",
       cloudy: "Cloudy",
+      overcast: "Overcast",
       rain: "Rain",
+      drizzle: "Drizzle",
+      storm: "Storm",
+      snow: "Snow",
+      fog: "Fog",
+      haze: "Haze",
+      dust: "Dust",
+      windy: "Windy",
+      randomWeather: "Random",
+      autoWeather: "Auto",
+      seasonLabel: "Season",
+      seasonKiremt: "Kiremt",
+      seasonTseday: "Tseday",
+      seasonBega: "Bega",
+      seasonBelg: "Belg",
       showHeatmap: "Show pollution heatmap",
-      population: "Population",
+      residents: "Residents",
+      eventCapacity: "Event capacity",
       jobs: "Jobs",
       energyNet: "Energy net",
       waterPerDay: "Water/day",
+      heatmapTitle: "Pollution heatmap",
+      intensityLow: "Less",
+      intensityHigh: "More",
+      weatherScaling:
+        "Warehouse emissions scale with the weather — stagnant air traps them, storms wash them out.",
     },
     assistant: {
       title: "AI assistant",
@@ -176,7 +217,8 @@ export const dictionary: Record<Locale, Dictionary> = {
     landing: {
       tagline: "ከተማ · Ketema AI",
       headline: "ብልህ ከተማን በቀጥታ በአሳሽዎ ይገንቡ።",
-      subtitle: "ለከተማ ፕላን ዝግጅት የ3ዲ ዲጂታል መንትያ አርታኢ — ሕንጻዎችን፣ መንገዶችን እና መሠረተ ልማቶችን ያስቀምጡ፣ ከዚያም ትራፊክን፣ ኃይልን እና የአየር ሁኔታን ያስመስሉ።",
+      subtitle:
+        "ለከተማ ፕላን ዝግጅት የ3ዲ ዲጂታል መንትያ አርታኢ — ሕንጻዎችን፣ መንገዶችን እና መሠረተ ልማቶችን ያስቀምጡ፣ ከዚያም ትራፊክን፣ ኃይልን እና የአየር ሁኔታን ያስመስሉ።",
       tryLocally: "በአካባቢው ይሞክሩ",
       signInAndSave: "ይግቡና ከተሞችን ያስቀምጡ",
     },
@@ -239,12 +281,32 @@ export const dictionary: Record<Locale, Dictionary> = {
       title: "ማስመሰያ",
       clear: "ግልጽ",
       cloudy: "ደመናማ",
+      overcast: "ሙሉ ደመና",
       rain: "ዝናብ",
+      drizzle: "ቀጭን ዝናብ",
+      storm: "ማዕበል",
+      snow: "በረዶ",
+      fog: "ጭጋግ",
+      haze: "አቧራማ",
+      dust: "የአቧራ አውሎ",
+      windy: "ነፋሻማ",
+      randomWeather: "የዘፈቀደ",
+      autoWeather: "ራስ-ሰር",
+      seasonLabel: "ወቅት",
+      seasonKiremt: "ክረምት",
+      seasonTseday: "ፀደይ",
+      seasonBega: "በጋ",
+      seasonBelg: "በልግ",
       showHeatmap: "የብክለት ካርታ አሳይ",
-      population: "ሕዝብ ብዛት",
+      residents: "ነዋሪዎች",
+      eventCapacity: "የዝግጅት አቅም",
       jobs: "የስራ ቦታዎች",
       energyNet: "ተጣራ ኃይል",
       waterPerDay: "ውሃ/ቀን",
+      heatmapTitle: "የብክለት ካርታ",
+      intensityLow: "አነስተኛ",
+      intensityHigh: "ከፍተኛ",
+      weatherScaling: "የመጋዘን ልቀቶች ከአየር ሁኔታ ጋር ይለወጣሉ — ጸጥ ያለ አየር ያጨናንቃል፣ ማዕበል ያጥባል።",
     },
     assistant: {
       title: "የAI ረዳት",

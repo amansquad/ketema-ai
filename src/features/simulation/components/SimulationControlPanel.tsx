@@ -1,19 +1,25 @@
 "use client";
 
-import { Cloud, CloudRain, Droplet, Gauge, Pause, Play, Sun, Users, Zap } from "lucide-react";
+import { Dices, Droplet, Gauge, Pause, Play, Sun, Users, Zap } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 import { selectSceneObjects, useEditorStore } from "@/features/editor/store/useEditorStore";
+import type { Dictionary } from "@/features/i18n/locales/dictionary";
 import { useTranslation } from "@/features/i18n/lib/useTranslation";
 import { computeCityMetrics } from "@/features/simulation/engine/metrics";
-import { useSimulationStore, type WeatherKind } from "@/features/simulation/store/useSimulationStore";
+import { WEATHER_ICONS, weatherLabelFor } from "@/features/simulation/lib/weather";
+import { seasonForDay, type SeasonKind } from "@/features/simulation/lib/weatherSchedule";
+import { useSimulationStore } from "@/features/simulation/store/useSimulationStore";
 
-const WEATHER_ICONS: { kind: WeatherKind; Icon: typeof Sun }[] = [
-  { kind: "clear", Icon: Sun },
-  { kind: "cloudy", Icon: Cloud },
-  { kind: "rain", Icon: CloudRain },
-];
+// Localized label key for each season, so the chip reads the dictionary the
+// same way the weather selectors do (keyed lookups, no drift).
+const SEASON_LABEL_KEY: Record<SeasonKind, keyof Dictionary["simulation"]> = {
+  kiremt: "seasonKiremt",
+  tseday: "seasonTseday",
+  bega: "seasonBega",
+  belg: "seasonBelg",
+};
 
 function formatHour(hour24: number): string {
   const hours = Math.floor(hour24);
@@ -26,11 +32,6 @@ function formatHour(hour24: number): string {
 export function SimulationControlPanel() {
   const [collapsed, setCollapsed] = useState(false);
   const { t } = useTranslation();
-  const WEATHER_LABELS: Record<WeatherKind, string> = {
-    clear: t.simulation.clear,
-    cloudy: t.simulation.cloudy,
-    rain: t.simulation.rain,
-  };
 
   const running = useSimulationStore((state) => state.running);
   const hour24 = useSimulationStore((state) => state.hour24);
@@ -42,9 +43,18 @@ export function SimulationControlPanel() {
   const setSpeed = useSimulationStore((state) => state.setSpeed);
   const setWeather = useSimulationStore((state) => state.setWeather);
   const toggleHeatmap = useSimulationStore((state) => state.toggleHeatmap);
+  const dayOfYear = useSimulationStore((state) => state.dayOfYear);
+  const autoWeather = useSimulationStore((state) => state.autoWeather);
+  const randomizeWeather = useSimulationStore((state) => state.randomizeWeather);
+  const setAutoWeather = useSimulationStore((state) => state.setAutoWeather);
+
+  const season = seasonForDay(dayOfYear);
 
   const objects = useEditorStore(useShallow(selectSceneObjects));
-  const metrics = useMemo(() => computeCityMetrics(objects, hour24, weather), [objects, hour24, weather]);
+  const metrics = useMemo(
+    () => computeCityMetrics(objects, hour24, weather),
+    [objects, hour24, weather],
+  );
 
   if (collapsed) {
     return (
@@ -88,7 +98,9 @@ export function SimulationControlPanel() {
           onChange={(event) => setHour(event.target.valueAsNumber)}
           className="flex-1 accent-emerald-500"
         />
-        <span className="w-16 text-right text-xs text-zinc-400 tabular-nums">{formatHour(hour24)}</span>
+        <span className="w-16 text-right text-xs text-zinc-400 tabular-nums">
+          {formatHour(hour24)}
+        </span>
       </div>
 
       <div className="flex items-center gap-2 px-3 pb-2.5">
@@ -104,36 +116,94 @@ export function SimulationControlPanel() {
         />
       </div>
 
-      <div className="flex gap-1 px-3 pb-2.5">
-        {WEATHER_ICONS.map(({ kind, Icon }) => (
-          <button
-            key={kind}
-            type="button"
-            onClick={() => setWeather(kind)}
-            title={WEATHER_LABELS[kind]}
-            className={`flex flex-1 items-center justify-center gap-1 rounded-md py-1.5 text-xs transition-colors ${
-              weather === kind ? "bg-emerald-500 text-zinc-950" : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
-            }`}
-          >
-            <Icon className="h-3.5 w-3.5" />
-            {WEATHER_LABELS[kind]}
-          </button>
-        ))}
+      {/* Random weather, the current season (drives auto-weather odds), and
+          the auto-weather toggle. */}
+      <div className="flex items-center gap-1.5 border-t border-zinc-800 px-3 py-2">
+        <button
+          type="button"
+          onClick={randomizeWeather}
+          title={t.simulation.randomWeather}
+          className="flex h-7 shrink-0 items-center gap-1.5 rounded-md bg-zinc-800 px-2 text-[11px] font-medium text-zinc-300 transition-colors hover:bg-zinc-700 hover:text-white"
+        >
+          <Dices className="h-3.5 w-3.5" />
+          {t.simulation.randomWeather}
+        </button>
+        <span className="min-w-0 truncate rounded-md bg-zinc-800/60 px-2 py-1 text-[10px] text-zinc-400">
+          {t.simulation.seasonLabel}:{" "}
+          <span className="font-medium text-emerald-400">
+            {t.simulation[SEASON_LABEL_KEY[season]]}
+          </span>
+        </span>
+        <label
+          className="ml-auto flex shrink-0 items-center gap-1 text-[11px] text-zinc-400"
+          title={t.simulation.autoWeather}
+        >
+          <input
+            type="checkbox"
+            checked={autoWeather}
+            onChange={(event) => setAutoWeather(event.target.checked)}
+            className="accent-emerald-500"
+          />
+          {t.simulation.autoWeather}
+        </label>
+      </div>
+
+      <div className="grid grid-cols-4 gap-1 px-3 pb-2.5">
+        {WEATHER_ICONS.map(({ kind, Icon }) => {
+          const label = weatherLabelFor(t.simulation, kind);
+          const active = weather === kind;
+          return (
+            <button
+              key={kind}
+              type="button"
+              onClick={() => setWeather(kind)}
+              title={label}
+              aria-pressed={active}
+              className={`flex flex-col items-center gap-0.5 rounded-md py-1.5 text-[10px] transition-colors ${
+                active
+                  ? "bg-emerald-500 text-zinc-950"
+                  : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5" />
+              {label}
+            </button>
+          );
+        })}
       </div>
 
       <label className="flex items-center gap-2 border-t border-zinc-800 px-3 py-2.5 text-xs text-zinc-400">
-        <input type="checkbox" checked={showHeatmap} onChange={toggleHeatmap} className="accent-emerald-500" />
+        <input
+          type="checkbox"
+          checked={showHeatmap}
+          onChange={toggleHeatmap}
+          className="accent-emerald-500"
+        />
         {t.simulation.showHeatmap}
       </label>
 
       <div className="grid grid-cols-2 gap-2 border-t border-zinc-800 px-3 py-2.5 text-xs">
-        <Stat icon={Users} label={t.simulation.population} value={metrics.population.toLocaleString()} />
+        <Stat
+          icon={Users}
+          label={t.simulation.residents}
+          value={metrics.residents.toLocaleString()}
+        />
+        <Stat
+          icon={Users}
+          label={t.simulation.eventCapacity}
+          value={metrics.eventVisitors.toLocaleString()}
+        />
         <Stat icon={Users} label={t.simulation.jobs} value={metrics.jobs.toLocaleString()} />
-        <Stat icon={Zap} label={t.simulation.energyNet} value={`${metrics.netEnergyKw.toFixed(1)} kW`} />
+        <Stat
+          icon={Zap}
+          label={t.simulation.energyNet}
+          value={`${metrics.netEnergyKw.toFixed(1)} kW`}
+        />
         <Stat
           icon={Droplet}
           label={t.simulation.waterPerDay}
           value={`${Math.round(metrics.waterConsumptionLitersPerDay / 1000)} m³`}
+          className="col-span-2"
         />
       </div>
     </div>
@@ -144,13 +214,17 @@ function Stat({
   icon: Icon,
   label,
   value,
+  className,
 }: {
   icon: typeof Sun;
   label: string;
   value: string;
+  className?: string;
 }) {
   return (
-    <div className="flex items-center gap-2 rounded-md bg-zinc-800/60 px-2 py-1.5">
+    <div
+      className={`flex items-center gap-2 rounded-md bg-zinc-800/60 px-2 py-1.5 ${className ?? ""}`}
+    >
       <Icon className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
       <div className="min-w-0">
         <p className="truncate text-zinc-500">{label}</p>
