@@ -39,3 +39,23 @@ export function screenToGroundPoint(clientX: number, clientY: number): Vector3 |
   const hit = raycaster.ray.intersectPlane(groundPlane, hitPoint);
   return hit ? hit.clone() : null;
 }
+
+/**
+ * Ground point roughly a third of the way up from the bottom of the current
+ * view — i.e. "in front of the camera, in the near/middle ground" rather
+ * than dead-center (which, at this editor's default overhead-ish angle,
+ * projects to a point far off toward the horizon). Used as the drop point
+ * for click-to-place, so newly placed assets land somewhere already visible
+ * and close to the camera instead of requiring the user to pan/zoom to find
+ * them.
+ */
+export function cameraGroundPoint(): Vector3 | null {
+  if (!activeViewport) return null;
+
+  ndc.x = 0;
+  ndc.y = -0.35;
+
+  raycaster.setFromCamera(ndc, activeViewport.camera);
+  const hit = raycaster.ray.intersectPlane(groundPlane, hitPoint);
+  return hit ? hit.clone() : null;
+}
