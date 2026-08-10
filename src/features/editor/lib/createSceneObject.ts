@@ -46,6 +46,14 @@ export const ASSET_DEFAULTS: Record<AssetKind, AssetDefaults> = {
   "bus-station": { label: "Bus Station", scale: [6, 3, 3.5], color: "#6b6660", roughness: 0.6, metalness: 0.1 },
   "grain-silo": { label: "Grain Silo", scale: [3.5, 9, 3.5], color: "#c9c4ba", roughness: 0.4, metalness: 0.5 },
   "railway-station": { label: "Railway Station", scale: [12, 6, 7], color: "#8a6a4a", roughness: 0.6, metalness: 0.1 },
+  "police-station": { label: "Police Station", scale: [7, 6, 7], color: "#5b6b7a", roughness: 0.6, metalness: 0.1 },
+  university: { label: "University", scale: [14, 9, 11], color: "#8a6a4a", roughness: 0.65, metalness: 0.05 },
+  cemetery: { label: "Cemetery", scale: [12, 0.2, 12], color: "#5c7a52", roughness: 1, metalness: 0 },
+  "farm-field": { label: "Farm Field", scale: [14, 0.15, 14], color: "#8a6a3a", roughness: 1, metalness: 0 },
+  substation: { label: "Power Substation", scale: [4, 3, 4], color: "#5b6068", roughness: 0.4, metalness: 0.5 },
+  "car-park": { label: "Car Park", scale: [12, 0.1, 12], color: "#2f2f33", roughness: 1, metalness: 0 },
+  "coffee-ceremony": { label: "Coffee Ceremony Pavilion", scale: [3, 2.8, 3], color: "#a8763e", roughness: 0.8, metalness: 0 },
+  "telecom-tower": { label: "Telecom Tower", scale: [1.2, 20, 1.2], color: "#b0b0b0", roughness: 0.4, metalness: 0.6 },
 };
 
 // Per-kind initial-transform variety, so repeated objects don't start as

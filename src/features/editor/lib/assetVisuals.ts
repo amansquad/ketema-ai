@@ -380,6 +380,78 @@ export const ASSET_PARTS: Partial<Record<AssetKind, AssetPart[]>> = {
     { id: "canopy-post-a", geometry: "cylinder", args: [1, 1, 1, 6], offset: [0.42, 0.4, 0.75], scale: [0.045, 0.8, 0.045], color: "#3a3a3f" },
     { id: "canopy-post-b", geometry: "cylinder", args: [1, 1, 1, 6], offset: [-0.42, 0.4, 0.75], scale: [0.045, 0.8, 0.045], color: "#3a3a3f" },
   ],
+  "police-station": [
+    // Compact civic block with a flat roof and a warning-beacon accent.
+    {
+      id: "block",
+      geometry: "box",
+      args: [1, 1, 1],
+      offset: [0, 0.4, 0],
+      scale: [1, 0.8, 0.8],
+      primary: true,
+      texture: { seed: 67, palette: NEUTRAL_PALETTE, repeat: [2, 2] },
+    },
+    { id: "roof", geometry: "box", args: [1, 1, 1], offset: [0, 0.82, 0], scale: [1.05, 0.06, 0.86], color: "#3a3a3f" },
+    { id: "beacon", geometry: "box", args: [1, 1, 1], offset: [0, 0.92, 0], scale: [0.14, 0.14, 0.14], color: "#d94f4f" },
+  ],
+  university: [
+    // Academic block with a columned portico, distinct from the school's bell tower.
+    {
+      id: "block",
+      geometry: "box",
+      args: [1, 1, 1],
+      offset: [0, 0.35, 0],
+      scale: [1, 0.7, 0.7],
+      primary: true,
+      texture: { seed: 68, palette: NEUTRAL_PALETTE, repeat: [3, 2] },
+    },
+    { id: "portico-roof", geometry: "box", args: [1, 1, 1], offset: [0, 0.74, 0.34], scale: [0.5, 0.06, 0.22], color: "#c9c4ba" },
+    { id: "column-a", geometry: "cylinder", args: [1, 1, 1, 8], offset: [0.18, 0.36, 0.42], scale: [0.035, 0.72, 0.035], color: "#e8e2d4" },
+    { id: "column-b", geometry: "cylinder", args: [1, 1, 1, 8], offset: [-0.18, 0.36, 0.42], scale: [0.035, 0.72, 0.035], color: "#e8e2d4" },
+  ],
+  cemetery: [
+    // Grass plot with a scatter of headstones — purely decorative.
+    { id: "ground", geometry: "box", args: [1, 1, 1], offset: [0, 0.05, 0], scale: [1, 1, 1], primary: true, color: "#5c7a52" },
+    { id: "headstone-a", geometry: "box", args: [1, 1, 1], offset: [0.25, 0.14, 0.15], scale: [0.05, 0.18, 0.03], color: "#b8b2a6" },
+    { id: "headstone-b", geometry: "box", args: [1, 1, 1], offset: [-0.2, 0.12, -0.2], scale: [0.05, 0.15, 0.03], color: "#b8b2a6" },
+    { id: "headstone-c", geometry: "box", args: [1, 1, 1], offset: [0.05, 0.13, -0.3], scale: [0.05, 0.16, 0.03], color: "#b8b2a6" },
+  ],
+  "farm-field": [
+    // Tilled soil with raised, ripened crop rows.
+    { id: "soil", geometry: "box", args: [1, 1, 1], offset: [0, 0.04, 0], scale: [1, 1, 1], primary: true, color: "#6b4a2f" },
+    { id: "row-a", geometry: "box", args: [1, 1, 1], offset: [0, 0.1, 0.25], scale: [0.9, 0.08, 0.15], color: "#c9a227" },
+    { id: "row-b", geometry: "box", args: [1, 1, 1], offset: [0, 0.1, -0.05], scale: [0.9, 0.08, 0.15], color: "#c9a227" },
+    { id: "row-c", geometry: "box", args: [1, 1, 1], offset: [0, 0.1, -0.35], scale: [0.9, 0.08, 0.15], color: "#c9a227" },
+  ],
+  substation: [
+    // Transformer yard: concrete pad, transformer housing, and insulator stacks.
+    { id: "pad", geometry: "box", args: [1, 1, 1], offset: [0, 0.05, 0], scale: [1.0, 0.1, 1.0], color: "#4a4a50" },
+    { id: "transformer", geometry: "box", args: [1, 1, 1], offset: [0, 0.35, 0], scale: [0.6, 0.5, 0.5], primary: true, color: "#5b6068" },
+    { id: "insulator-a", geometry: "cylinder", args: [1, 1, 1, 6], offset: [0.25, 0.65, 0], scale: [0.04, 0.3, 0.04], color: "#d8d6d0" },
+    { id: "insulator-b", geometry: "cylinder", args: [1, 1, 1, 6], offset: [-0.25, 0.65, 0], scale: [0.04, 0.3, 0.04], color: "#d8d6d0" },
+  ],
+  "car-park": [
+    // Asphalt lot with painted bay lines and a small attendant booth.
+    { id: "lot", geometry: "box", args: [1, 1, 1], offset: [0, 0.03, 0], scale: [1, 1, 1], primary: true, color: "#2f2f33" },
+    { id: "line-a", geometry: "box", args: [1, 1, 1], offset: [0, 0.065, 0.2], scale: [0.9, 0.01, 0.03], color: "#e8e2d4" },
+    { id: "line-b", geometry: "box", args: [1, 1, 1], offset: [0, 0.065, -0.1], scale: [0.9, 0.01, 0.03], color: "#e8e2d4" },
+    { id: "booth", geometry: "box", args: [1, 1, 1], offset: [0.4, 0.15, 0.4], scale: [0.12, 0.3, 0.12], color: "#8a6a4a" },
+  ],
+  "coffee-ceremony": [
+    // Round platform on two posts under a thatched conical roof, for the
+    // traditional Ethiopian coffee ceremony (bunna).
+    { id: "platform", geometry: "cylinder", args: [1, 1, 1, 14], offset: [0, 0.05, 0], scale: [0.9, 0.1, 0.9], primary: true, color: "#8a6a4a" },
+    { id: "post-a", geometry: "cylinder", args: [1, 1, 1, 6], offset: [0.3, 0.4, 0.3], scale: [0.04, 0.7, 0.04], color: "#6b4a2f" },
+    { id: "post-b", geometry: "cylinder", args: [1, 1, 1, 6], offset: [-0.3, 0.4, 0.3], scale: [0.04, 0.7, 0.04], color: "#6b4a2f" },
+    { id: "roof", geometry: "cone", args: [1, 1, 10], offset: [0, 0.85, 0], scale: [0.65, 0.4, 0.65], color: "#a8763e" },
+  ],
+  "telecom-tower": [
+    // Slender lattice mast with an antenna crossbar and a warning beacon.
+    { id: "mast", geometry: "cylinder", args: [1, 1, 1, 6], offset: [0, 0.5, 0], scale: [0.06, 1, 0.06], primary: true, color: "#b0b0b0" },
+    { id: "crossbar", geometry: "box", args: [1, 1, 1], offset: [0, 0.7, 0], scale: [0.5, 0.03, 0.03], color: "#8a8a8a" },
+    { id: "panel", geometry: "box", args: [1, 1, 1], offset: [0, 0.7, 0], scale: [0.04, 0.15, 0.02], color: "#3a3a3f" },
+    { id: "beacon", geometry: "sphere", args: [1, 8, 8], offset: [0, 1.02, 0], scale: [0.03, 0.03, 0.03], color: "#d94f4f" },
+  ],
 };
 
 /** Every asset kind not customized above renders as a single box or cylinder, matching the shape it already had. */

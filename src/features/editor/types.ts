@@ -35,7 +35,15 @@ export type AssetKind =
   | "obelisk"
   | "bus-station"
   | "grain-silo"
-  | "railway-station";
+  | "railway-station"
+  | "police-station"
+  | "university"
+  | "cemetery"
+  | "farm-field"
+  | "substation"
+  | "car-park"
+  | "coffee-ceremony"
+  | "telecom-tower";
 
 export interface SceneObjectMaterial {
   color: string; // hex, e.g. "#8899aa"

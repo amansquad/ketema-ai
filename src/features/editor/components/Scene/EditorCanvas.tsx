@@ -54,9 +54,22 @@ export function EditorCanvas() {
             light alone can't shade), Bloom only catches genuinely bright
             pixels (sun, lit windows, water highlights) rather than blooming
             the whole scene, and Vignette is subtle enough to add depth
-            without reading as a filter. */}
+            without reading as a filter.
+            screenSpaceRadius keeps the AO radius in screen space rather than
+            world space — without it, a world-space radius of 2 units reads as
+            enormous against the 2000-unit ground plane at a distance, and the
+            per-pixel AO sample pattern dithers/shimmers as the camera moves
+            ("the ground keeps shaking"). halfRes trades a little AO softness
+            for meaningfully better frame time while orbiting/dragging. */}
         <EffectComposer multisampling={0}>
-          <N8AO aoRadius={2} distanceFalloff={1} intensity={2} quality="performance" />
+          <N8AO
+            aoRadius={1}
+            distanceFalloff={1}
+            intensity={1.5}
+            quality="performance"
+            screenSpaceRadius
+            halfRes
+          />
           <Bloom
             luminanceThreshold={0.85}
             luminanceSmoothing={0.2}

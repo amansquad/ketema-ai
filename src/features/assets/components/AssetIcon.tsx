@@ -4,7 +4,10 @@ import {
   Church,
   CircleDot,
   Clock,
+  Coffee,
+  Cross,
   Droplets,
+  GraduationCap,
   Hospital,
   House,
   Lamp,
@@ -12,11 +15,15 @@ import {
   Milestone,
   Mosque,
   Mountain,
+  ParkingSquare,
   Route,
   School,
+  ShieldAlert,
+  Sprout,
   Store,
   Sun,
   Torus,
+  TowerControl,
   TrafficCone,
   TrainFront,
   TreePine,
@@ -27,6 +34,7 @@ import {
   Waypoints,
   Wheat,
   Wind,
+  Zap,
 } from "lucide-react";
 import type { ComponentType } from "react";
 
@@ -61,6 +69,14 @@ const ICONS: Record<AssetCatalogEntry["iconName"], ComponentType<{ className?: s
   Bus,
   Wheat,
   TrainFront,
+  ShieldAlert,
+  GraduationCap,
+  Cross,
+  Sprout,
+  Zap,
+  ParkingSquare,
+  Coffee,
+  TowerControl,
 };
 
 export function AssetIcon({

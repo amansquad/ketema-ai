@@ -36,6 +36,16 @@ const FLAT_ASSETS = new Set<AssetKind>(["road", "park", "river", "lake"]);
 
 const SELECTED_COLOR = "#ffb020";
 
+// drei's <Instances> allocates its instance-matrix Float32Array once, sized
+// from whatever `limit` it first mounts with (it's a useState initializer,
+// not reactive — see node_modules/@react-three/drei/core/Instances.js). If
+// `limit` tracked the live object count, adding a second object of a kind
+// that already had one instance would overflow that fixed-size buffer and
+// corrupt/blank the whole part's InstancedMesh, not just the new instance.
+// A large stable ceiling avoids ever needing to remount the group; `range`
+// (which IS read live, every frame) still caps how many are actually drawn.
+const INSTANCE_LIMIT = 5000;
+
 interface AssetInstanceGroupProps {
   assetKind: AssetKind;
   objects: SceneObject[];
@@ -108,7 +118,7 @@ function PartInstances({
   const map = useMemo(() => getPartTexture(part), [part]);
 
   return (
-    <Instances limit={objects.length} range={objects.length} castShadow={castShadow} receiveShadow>
+    <Instances limit={INSTANCE_LIMIT} range={objects.length} castShadow={castShadow} receiveShadow>
       {part.geometry === "cylinder" && <cylinderGeometry args={part.args} />}
       {part.geometry === "cone" && <coneGeometry args={part.args} />}
       {part.geometry === "sphere" && <sphereGeometry args={part.args} />}

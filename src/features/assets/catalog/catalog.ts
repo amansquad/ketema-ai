@@ -55,7 +55,15 @@ export interface AssetCatalogEntry {
     | "Milestone"
     | "Bus"
     | "Wheat"
-    | "TrainFront";
+    | "TrainFront"
+    | "ShieldAlert"
+    | "GraduationCap"
+    | "Cross"
+    | "Sprout"
+    | "Zap"
+    | "ParkingSquare"
+    | "Coffee"
+    | "TowerControl";
   defaultTags: string[];
 }
 
@@ -299,6 +307,70 @@ export const ASSET_CATALOG: AssetCatalogEntry[] = [
     description: "Passenger rail terminal, e.g. Addis Ababa–Djibouti line-style station — transit jobs hub.",
     iconName: "TrainFront",
     defaultTags: ["infrastructure", "transit", "jobs"],
+  },
+  {
+    kind: "police-station",
+    label: "Police Station",
+    category: "civic",
+    description: "Public safety facility — civic jobs and round-the-clock base load.",
+    iconName: "ShieldAlert",
+    defaultTags: ["civic", "safety", "jobs"],
+  },
+  {
+    kind: "university",
+    label: "University",
+    category: "civic",
+    description: "Higher-education campus building — larger jobs and energy footprint than a school.",
+    iconName: "GraduationCap",
+    defaultTags: ["civic", "education", "jobs"],
+  },
+  {
+    kind: "cemetery",
+    label: "Cemetery",
+    category: "civic",
+    description: "Burial ground with headstones — purely decorative, no simulation load.",
+    iconName: "Cross",
+    defaultTags: ["civic", "landmark"],
+  },
+  {
+    kind: "farm-field",
+    label: "Farm Field",
+    category: "nature",
+    description: "Cultivated crop plot with furrow rows — a mild pollution sink like open land.",
+    iconName: "Sprout",
+    defaultTags: ["nature", "agriculture"],
+  },
+  {
+    kind: "substation",
+    label: "Power Substation",
+    category: "energy",
+    description: "Grid transformer yard — distinct from generation; draws a small auxiliary load.",
+    iconName: "Zap",
+    defaultTags: ["energy", "infrastructure"],
+  },
+  {
+    kind: "car-park",
+    label: "Car Park",
+    category: "infrastructure",
+    description: "Surface parking lot — a minor idling-exhaust pollution source.",
+    iconName: "ParkingSquare",
+    defaultTags: ["infrastructure", "traffic"],
+  },
+  {
+    kind: "coffee-ceremony",
+    label: "Coffee Ceremony Pavilion",
+    category: "ethiopia",
+    description: "Thatched-roof pavilion for the traditional Ethiopian coffee ceremony — small kiosk jobs.",
+    iconName: "Coffee",
+    defaultTags: ["ethiopia", "culture", "commercial"],
+  },
+  {
+    kind: "telecom-tower",
+    label: "Telecom Tower",
+    category: "utilities",
+    description: "Cellular/microwave relay mast — utility infrastructure with a steady base load.",
+    iconName: "TowerControl",
+    defaultTags: ["utilities", "infrastructure"],
   },
 ];
 

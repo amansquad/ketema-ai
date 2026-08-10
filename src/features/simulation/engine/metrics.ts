@@ -13,6 +13,9 @@ const JOBS_PER_WAREHOUSE = 12; // logistics/industrial jobs
 const JOBS_PER_MARKET_STALL = 4; // one or two traders per stall
 const JOBS_PER_GRAIN_SILO = 8; // milling/storage crew
 const JOBS_PER_RAILWAY_STATION = 20; // terminal staff
+const JOBS_PER_POLICE_STATION = 10; // officers/staff on shift
+const JOBS_PER_UNIVERSITY = 30; // faculty and staff, bigger than a school
+const JOBS_PER_COFFEE_CEREMONY = 2; // one or two hosts per pavilion
 const STADIUM_VISITOR_CAPACITY = 600; // event-day visitors, not residents
 const WATER_LITERS_PER_CAPITA = 130;
 const SOLAR_PEAK_KW = 4;
@@ -28,6 +31,11 @@ const BUILDING_BASE_LOAD_KW: Partial<Record<AssetKind, number>> = {
   "clock-tower": 0.3,
   "bus-station": 1,
   "railway-station": 6,
+  "police-station": 4,
+  university: 8,
+  substation: 2, // auxiliary yard systems, not grid throughput
+  "coffee-ceremony": 0.3,
+  "telecom-tower": 3,
 };
 const STREET_LIGHT_LOAD_KW = 0.15;
 const POLLUTION_SOURCE_WEIGHT: Partial<Record<AssetKind, number>> = {
@@ -39,6 +47,7 @@ const POLLUTION_SOURCE_WEIGHT: Partial<Record<AssetKind, number>> = {
   "bus-station": 1.5, // idling diesel minibuses
   "grain-silo": 1, // milling dust/emissions
   "railway-station": 1.5, // diesel rail traffic
+  "car-park": 0.8, // idling exhaust
 };
 // Vegetation and open water clean the air: trees, parks, and the water
 // features added in the expanded catalog (fountains are modest, lakes are
@@ -48,6 +57,7 @@ const POLLUTION_SINK_WEIGHT: Partial<Record<AssetKind, number>> = {
   park: -2.5,
   fountain: -0.75,
   lake: -2,
+  "farm-field": -1, // open cultivated land, less filtering than a park
 };
 // Industrial emissions are weather-sensitive: clear, stagnant high-pressure
 // air traps particulates (worse), while rain scrubs them out of the sky
@@ -155,7 +165,10 @@ export function computeCityMetrics(
     (counts.warehouse ?? 0) * JOBS_PER_WAREHOUSE +
     (counts["market-stall"] ?? 0) * JOBS_PER_MARKET_STALL +
     (counts["grain-silo"] ?? 0) * JOBS_PER_GRAIN_SILO +
-    (counts["railway-station"] ?? 0) * JOBS_PER_RAILWAY_STATION;
+    (counts["railway-station"] ?? 0) * JOBS_PER_RAILWAY_STATION +
+    (counts["police-station"] ?? 0) * JOBS_PER_POLICE_STATION +
+    (counts.university ?? 0) * JOBS_PER_UNIVERSITY +
+    (counts["coffee-ceremony"] ?? 0) * JOBS_PER_COFFEE_CEREMONY;
 
   const solarKw =
     (counts["solar-panel"] ?? 0) * SOLAR_PEAK_KW * daylight * WEATHER_SOLAR_MULTIPLIER[weather];
