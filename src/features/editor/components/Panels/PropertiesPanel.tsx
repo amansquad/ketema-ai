@@ -13,6 +13,7 @@ import {
 import { MetadataEditor } from "@/features/editor/components/Panels/MetadataEditor";
 import { TagsEditor } from "@/features/editor/components/Panels/TagsEditor";
 import { useEditorStore } from "@/features/editor/store/useEditorStore";
+import { getAssetParts } from "@/features/editor/lib/assetVisuals";
 import type { SceneObject, Vector3Tuple } from "@/features/editor/types";
 import { useTranslation } from "@/features/i18n/lib/useTranslation";
 
@@ -64,6 +65,7 @@ function PropertiesForm({ selectedId, object }: { selectedId: string; object: Sc
   const [draft, setDraft] = useState<SceneObject>(object);
 
   const catalogEntry = getCatalogEntry(draft.assetKind);
+  const parts = getAssetParts(catalogEntry.kind);
 
   function patchLocal(patch: Partial<SceneObject>) {
     setDraft((prev) => ({ ...prev, ...patch }));
@@ -143,6 +145,21 @@ function PropertiesForm({ selectedId, object }: { selectedId: string; object: Sc
           value={draft.material.metalness}
           onCommit={(metalness) => commitNow({ material: { ...draft.material, metalness } })}
         />
+      </PanelSection>
+
+      <PanelSection title="Part Colors">
+        {parts.map((part) => (
+          <ColorField
+            key={part.id}
+            label={part.id}
+            value={draft.partColors?.[part.id] ?? (part.color ?? draft.material.color)}
+            onCommit={(color) =>
+              commitNow({
+                partColors: { ...draft.partColors, [part.id]: color },
+              })
+            }
+          />
+        ))}
       </PanelSection>
 
       <PanelSection title={t.properties.tags}>

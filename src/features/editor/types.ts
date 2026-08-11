@@ -61,6 +61,7 @@ export interface SceneObject {
   material: SceneObjectMaterial;
   tags: string[];
   metadata: Record<string, string | number | boolean>;
+  partColors?: Record<string, string>; // Overrides for specific part IDs
   createdAt: number;
   updatedAt: number;
 }

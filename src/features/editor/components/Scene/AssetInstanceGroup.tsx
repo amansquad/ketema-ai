@@ -2,7 +2,7 @@
 
 import { Instance, Instances } from "@react-three/drei";
 import { useCallback, useMemo } from "react";
-import type { Object3D } from "three";import { makeNoiseTexture } from "@/features/editor/lib/proceduralTexture";
+import { Color, type Object3D } from "three";import { makeNoiseTexture } from "@/features/editor/lib/proceduralTexture";
 import { getPartVariation } from "@/features/editor/lib/objectVariation";
 import { ASSET_DEFAULTS } from "@/features/editor/lib/createSceneObject";
 
@@ -35,6 +35,27 @@ import type { AssetKind, SceneObject, Vector3Tuple } from "@/features/editor/typ
 const FLAT_ASSETS = new Set<AssetKind>(["road", "park", "river", "lake"]);
 
 const SELECTED_COLOR = "#ffb020";
+
+// Fixed-color accent parts (a commercial tower's glass, a mosque's dome, a
+// building's window bands, ...) previously ignored the object's own color
+// entirely — only the one part marked `primary` responded to the color
+// picker, which for e.g. Commercial Building is a thin ground-floor podium
+// dwarfed by the (fixed navy) glass tower above it, so changing the color
+// looked like it barely did anything. Blending a fraction of the object's
+// chosen color into every accent part keeps their intended material read
+// (glass still reads as glass, roofs still read as roofs) while making the
+// whole object visibly respond to the color picker instead of just one
+// small part. Two scratch Color instances avoid a per-call allocation.
+const ACCENT_TINT_AMOUNT = 0.7;
+const scratchAccentColor = new Color();
+const scratchBaseColor = new Color();
+
+function tintAccentColor(accentHex: string, baseHex: string): string {
+  scratchAccentColor.set(accentHex);
+  scratchBaseColor.set(baseHex);
+  scratchAccentColor.lerp(scratchBaseColor, ACCENT_TINT_AMOUNT);
+  return `#${scratchAccentColor.getHexString()}`;
+}
 
 // drei's <Instances> allocates its instance-matrix Float32Array once, sized
 // from whatever `limit` it first mounts with (it's a useState initializer,
@@ -197,7 +218,11 @@ function PartInstanceItem({ object, part, isSelected, onSelectRef, onSelect }: P
     partRotation[0] += variation.tilt;
   }
   const rotation = composeRotations(object.rotation, partRotation);
-  const color = isSelected ? SELECTED_COLOR : (part.color ?? object.material.color);
+  const color = isSelected
+    ? SELECTED_COLOR
+    : (object.partColors?.[part.id] ?? part.color)
+      ? tintAccentColor(object.partColors?.[part.id] ?? part.color ?? "#ffffff", object.material.color)
+      : object.material.color;
 
   return (
     <Instance
