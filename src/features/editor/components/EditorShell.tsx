@@ -10,6 +10,7 @@ import { AnalyticsOverlay } from "@/features/dashboard/components/AnalyticsOverl
 import { PropertiesPanel } from "@/features/editor/components/Panels/PropertiesPanel";
 import { EditorCanvas } from "@/features/editor/components/Scene/EditorCanvas";
 import { EditorToolbar } from "@/features/editor/components/Toolbar/EditorToolbar";
+import { TutorialOverlay } from "@/features/editor/components/TutorialOverlay";
 import { useEditorKeyboardShortcuts } from "@/features/editor/hooks/useEditorKeyboardShortcuts";
 import { screenToGroundPoint } from "@/features/editor/lib/viewport";
 import { selectSceneObjects, useEditorStore } from "@/features/editor/store/useEditorStore";
@@ -67,8 +68,8 @@ export function EditorShell({ projectId }: { projectId: string }) {
       <EditorToolbar onOpenAnalytics={() => setAnalyticsOpen(true)} />
       <AssetPalette />
       <PropertiesPanel />
-      {analyticsOpen && <AnalyticsOverlay onClose={() => setAnalyticsOpen(false)} />}
-
+      <TutorialOverlay />
+      {analyticsOpen && <AnalyticsOverlay onClose={() => setAnalyticsOpen(false)} />}\n
       <div className="pointer-events-none absolute bottom-4 left-4 flex flex-col items-start gap-2">
         <AiAssistantPanel />
         <div className="rounded-md border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-xs text-zinc-400 backdrop-blur">

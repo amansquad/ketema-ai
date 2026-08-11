@@ -53,7 +53,7 @@ export function SelectionGizmo({ target, objectId }: SelectionGizmoProps) {
     <TransformControls
       object={target}
       mode={transformMode}
-      makeDefault={false}
+      makeDefault={true}
       onMouseDown={() => setOrbitControlsEnabled(false)}
       onMouseUp={() => {
         setOrbitControlsEnabled(true);
