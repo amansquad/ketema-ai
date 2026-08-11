@@ -3,7 +3,7 @@
 import type { ChangeEvent, KeyboardEvent, ReactNode } from "react";
 
 const inputClass =
-  "w-full rounded-md border border-zinc-700 bg-zinc-800 px-2 py-1 text-sm text-zinc-100 outline-none focus:border-emerald-500";
+  "w-full rounded-md border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm text-zinc-100 outline-none transition-colors focus:border-emerald-500 focus:bg-zinc-800";
 
 export function PanelSection({ title, children }: { title: string; children: ReactNode }) {
   return (

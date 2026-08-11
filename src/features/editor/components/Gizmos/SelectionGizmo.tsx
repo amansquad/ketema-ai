@@ -78,10 +78,13 @@ export function SelectionGizmo({ target, objectId }: SelectionGizmoProps) {
         const variation = getPartVariation(objectId, primaryPart);
         const scaleMul = variation?.scaleMul ?? 1;
 
+        // Fix: when scaling, we must account for the part's own local scale.
+        // target.scale is the current WORLD scale of the instance.
+        // object.scale = worldScale / partLocalScale / variationScale
         const scale: Vector3Tuple = [
-          target.scale.x / primaryPart.scale[0] / scaleMul,
-          target.scale.y / primaryPart.scale[1] / scaleMul,
-          target.scale.z / primaryPart.scale[2] / scaleMul,
+          target.scale.x / (primaryPart.scale[0] * scaleMul),
+          target.scale.y / (primaryPart.scale[1] * scaleMul),
+          target.scale.z / (primaryPart.scale[2] * scaleMul),
         ];
         // The primary part's fixed tilt is applied *before* the object's own
         // rotation (see composeRotations), so invert it to recover the object's
